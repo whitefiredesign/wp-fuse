@@ -1,7 +1,8 @@
 <?php namespace Fuse;
 
 class config {
-    public static $version = '1.0.0';
+    public static $version  = '0.0.1-dev';
+    public static $dev      = true;
 }
 
 class __init__ {
@@ -23,7 +24,8 @@ class __init__ {
 
     }
     
-    private function _functions() {
+    private function _functions
+    () {
         $scan = glob(__DIR__ . "/functions/*");
         foreach ($scan as $path) {
             if (preg_match('/\.php$/', $path)) {

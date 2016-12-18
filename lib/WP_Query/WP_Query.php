@@ -19,7 +19,13 @@ class WP_Query {
     }
 
     public function assets() {
-        wp_register_script('Fuse.WP_Query', get_file_abspath(__FILE__) . '/WP_Query.js', array('jquery'), \Fuse\config::$version, true);
+        
+        if(\Fuse\config::$dev) {
+            wp_register_script('Fuse.WP_Query', get_file_abspath(__FILE__) . '/WP_Query.js', array('jquery'), \Fuse\config::$version, true);
+        } else {
+            wp_register_script('Fuse.WP_Query', get_file_abspath(__FILE__) . '/WP_Query.min.js', array('jquery'), \Fuse\config::$version, true);
+        }
+        
         wp_enqueue_script('Fuse.WP_Query');
     }
 
@@ -38,7 +44,15 @@ class WP_Query {
         }
 
         if(!$args) {
-            $args = array();
+            $query->success    = 0;
+            $query->message     = 'No arguments set for WP_Query';
+
+            if($ajax) {
+                echo wp_json_encode($query);
+                die();
+            }
+
+            return wp_json_encode($query);
         }
 
         $query = new \WP_Query($args);
@@ -56,6 +70,7 @@ class WP_Query {
             }
         }
 
+        $query->success    = 1;
         $query->html        = $html;
         $query->template    = $template;
 

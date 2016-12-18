@@ -19,7 +19,13 @@ class Template {
     }
 
     public function assets() {
-        wp_register_script('Fuse.Template', get_file_abspath(__FILE__) . '/Template.js', array('jquery'), \Fuse\config::$version, true);
+
+        if(\Fuse\config::$dev) {
+            wp_register_script('Fuse.Template', get_file_abspath(__FILE__) . '/Template.js', array('jquery'), \Fuse\config::$version, true);
+        } else {
+            wp_register_script('Fuse.Template', get_file_abspath(__FILE__) . '/Template.min.js', array('jquery'), \Fuse\config::$version, true);
+        }
+        
         wp_enqueue_script('Fuse.Template');
     }
 
@@ -34,7 +40,7 @@ class Template {
 
         if(empty($template)) {
             $output = array(
-                'response'  => 0,
+                'success'   => 0,
                 'message'   => 'Template not found'
             );
 
@@ -52,7 +58,7 @@ class Template {
         ob_end_clean();
 
         $output = array(
-            'response'  => 1,
+            'success'   => 1,
             'html'      => $contents
         );
 
