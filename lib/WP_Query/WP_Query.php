@@ -111,8 +111,9 @@ class WP_Query {
         /**
          * Run the query and the loop
          */
-        $query = new \WP_Query($args);
-        $html = false;
+        $query      = new \WP_Query($args);
+        $post_count = $query->post_count;
+        $html       = false;
         if($template) {
             if($query->have_posts()) {
                 ob_start();
@@ -131,6 +132,7 @@ class WP_Query {
          * Success
          */
         $output['success']      = 1;
+        $output['count']        = $post_count;
         $output['html']         = $html;
         $output['template']     = $template[0] . '-' . $template[1] . '.php';
         $output['args']         = $args;
