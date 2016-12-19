@@ -20,18 +20,24 @@ class WP_Query {
 
     public function assets() {
         
-        if(\Fuse\config::$dev) {
-            wp_register_script('Fuse.WP_Query', get_file_abspath(__FILE__) . '/WP_Query.js', array('jquery'), \Fuse\config::$version, true);
-        } else {
-            wp_register_script('Fuse.WP_Query', get_file_abspath(__FILE__) . '/WP_Query.min.js', array('jquery'), \Fuse\config::$version, true);
+        if(config::$dev) {
+            Util\Uglify::compile_single(__DIR__ . '/WP_Query.js', 'min');
         }
-        
+
+        wp_register_script('Fuse.WP_Query', get_file_abspath(__FILE__) . '/WP_Query.min.js', array('jquery'), config::$version, true);
+
         wp_enqueue_script('Fuse.WP_Query');
     }
 
     public function query($args = false, $template = false) {
-        $ajax = false;
+        $ajax   = false;
+        $output = array(
+            'message' => ''
+        );
 
+        /**
+         * Validate the request
+         */
         if(isset($_REQUEST['WP_Query_ajax'])) {
             $ajax           = true;
 
@@ -43,20 +49,69 @@ class WP_Query {
             }
         }
 
-        if(!$args) {
-            $query->success    = 0;
-            $query->message     = 'No arguments set for WP_Query';
+        /**
+         * Post status always set to publish
+         */
+        $args['post_status'] = 'publish';
+
+        /**
+         * Check if post type supported
+         */
+        $post_types = $args['post_type'];
+        if(!is_array($post_types)) {
+            $post_types = array($post_types);
+        }
+        $pt_filter = filter_post_type_supports($post_types, 'Fuse.WP_Query');
+
+
+        /**
+         * If no post types allowed
+         */
+        if(empty($pt_filter['post_types'])) {
+            $output['success']     = 0;
+            $output['message']     = 'No authorised post types set.';
 
             if($ajax) {
-                echo wp_json_encode($query);
+                echo wp_json_encode($output);
                 die();
             }
 
-            return wp_json_encode($query);
+            return wp_json_encode($output);
         }
 
-        $query = new \WP_Query($args);
+        /**
+         * If some post types removed
+         */
+        if(!empty($pt_filter['removed'])) {
+            foreach($pt_filter['removed'] as $post_type) {
+                $output['message'] .= 'Post type - '. $post_type . ' not authorised.' . "\n\n";
+            }
+        }
 
+        /**
+         * Reset post types
+         */
+        $args['post_type'] = $post_types;
+
+        /**
+         * If no arguments set
+         */
+        if(!$args) {
+            $output['success']     = 0;
+            $output['message']     = 'No arguments set for WP_Query.';
+
+            if($ajax) {
+                echo wp_json_encode($output);
+                die();
+            }
+
+            return wp_json_encode($output);
+        }
+
+        /**
+         * Run the query and the loop
+         */
+        $query = new \WP_Query($args);
         $html = false;
         if($template) {
             if($query->have_posts()) {
@@ -67,19 +122,25 @@ class WP_Query {
                 }
                 $html = ob_get_contents();
                 ob_end_clean();
+            } else {
+                $output['message']     = 'No posts were found.';
             }
         }
 
-        $query->success    = 1;
-        $query->html        = $html;
-        $query->template    = $template;
+        /**
+         * Success
+         */
+        $output['success']      = 1;
+        $output['html']         = $html;
+        $output['template']     = $template[0] . '-' . $template[1] . '.php';
+        $output['args']         = $args;
 
         if($ajax) {
-            echo wp_json_encode($query);
+            echo wp_json_encode($output);
             die();
         }
 
-        return $query;
+        return $output;
     }
 }
 

@@ -1,4 +1,6 @@
 <?php namespace Fuse;
+// Autoload composer libs
+require __DIR__ . '/vendor/autoload.php';
 
 class config {
     public static $version  = '0.0.1-dev';
@@ -15,6 +17,11 @@ class __init__ {
         $this->_functions();
 
         /**
+         * Autoload utilities
+         */
+        $this->_utils();
+
+        /**
          * Require each module independently of theme support
          */
         add_action('wp_loaded', function() {
@@ -24,9 +31,16 @@ class __init__ {
 
     }
     
-    private function _functions
-    () {
-        $scan = glob(__DIR__ . "/functions/*");
+    private function _functions() {
+        $this->_load('functions');
+    }
+
+    private function _utils() {
+        $this->_load('util');
+    }
+
+    private function _load($dir) {
+        $scan = glob(__DIR__ . "/".$dir."/*");
         foreach ($scan as $path) {
             if (preg_match('/\.php$/', $path)) {
                 require_once $path;

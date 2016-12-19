@@ -20,12 +20,12 @@ class Template {
 
     public function assets() {
 
-        if(\Fuse\config::$dev) {
-            wp_register_script('Fuse.Template', get_file_abspath(__FILE__) . '/Template.js', array('jquery'), \Fuse\config::$version, true);
-        } else {
-            wp_register_script('Fuse.Template', get_file_abspath(__FILE__) . '/Template.min.js', array('jquery'), \Fuse\config::$version, true);
+        if(config::$dev) {
+            Util\Uglify::compile_single(__DIR__ . '/Template.js', 'min');
         }
-        
+
+        wp_register_script('Fuse.Template', get_file_abspath(__FILE__) . '/Template.min.js', array('jquery'), config::$version, true);
+
         wp_enqueue_script('Fuse.Template');
     }
 
