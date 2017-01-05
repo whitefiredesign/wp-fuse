@@ -1,0 +1,1 @@
+<button id="login-linkedin" data-connection-name="linkedin">Login with LinkedIn</button>

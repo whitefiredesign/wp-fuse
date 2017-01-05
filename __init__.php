@@ -36,13 +36,16 @@ class __init__ {
          * Need to load immediately
          */
 
-        add_action('wp_loaded', function() {
+
+        add_action('init', function() {
             /**
              * Need to load after application loaded
              */
             require_if_theme_supports('Fuse.WP_Query',  __DIR__ .'/lib/WP_Query/WP_Query.php');
             require_if_theme_supports('Fuse.Template',  __DIR__ .'/lib/Template/Template.php');
             require_if_theme_supports('Fuse.Stripe',    __DIR__ .'/lib/Stripe/Stripe.php');
+            require_if_theme_supports('Fuse.Auth0',     __DIR__ .'/lib/Auth0/Auth0.php');
+
         });
 
     }

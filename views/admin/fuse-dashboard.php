@@ -10,6 +10,7 @@
         <li><b>Fuse.WP_Query (JavaScript)</b> - a way to request posts using WP_Query in JavaScript</li>
         <li><b>Fuse.Template (JavaScript)</b> - a way to get a template part in JavaScript</li>
         <li><b>Fuse.Stripe (PHP)</b> - Creates a dashboard and provides a library of useful functions that assists management of Stripe</li>
+        <li><b>Fuse.Auth0 (PHP)</b> - Creates a dashboard and provides a library of useful functions that assists management of Auth0</li>
         <li><b>Fuse.Less (PHP)</b> - A way to compile Less files on-the-fly</li>
         <li><b>Fuse.Uglify (PHP)</b> - A way to compress JavaScript files on-the-fly</li>
     </ol>
