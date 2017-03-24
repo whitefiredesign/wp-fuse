@@ -8,7 +8,9 @@
 } ?>
 
 <?php
-try {
+/*
+ * Example get keys
+ * try {
     $keys = Stripe::get_keys(array(
         'secret'    => true
     ), 'test');
@@ -20,7 +22,7 @@ if(isset($keys)) {
     echo '<pre>';
     print_r($keys);
     echo '</pre>';
-}
+} */
 
 
 ?>

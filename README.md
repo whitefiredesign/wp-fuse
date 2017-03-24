@@ -1,7 +1,5 @@
 # WP Fuse
-Fuse is a WordPress micro-framework that aims to simplify AJAX communication between the browser and WordPress. 
-
-It also includes a handful of useful utility functions.
+Fuse is a micro-framework for WordPress developed by and for the devs @ White Fire Web Design. 
 
 License
 ----

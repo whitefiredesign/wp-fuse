@@ -13,7 +13,7 @@ class Stripe {
         });
     }
     
-    
+
     public static function save_options($options) {
         update_option('_stripe_options', $options);
         return get_option('_stripe_options');
@@ -21,6 +21,10 @@ class Stripe {
 
     public static function get_options() {
         $options    = get_option('_stripe_options');
+        if(!$options) {
+            return false;
+        }
+
         foreach($options as $k=>$v) {
             if($v=='') {
                 unset($options[$k]);
@@ -63,17 +67,19 @@ class Stripe {
         $options    = self::get_options();
         $filtered   = array();
 
-        foreach($options as $k => $v) {
+        if($options) {
+            foreach ($options as $k => $v) {
 
-            $k = explode("-", $k);
+                $k = explode("-", $k);
 
-            /**
-             * First find the environment (test or live)
-             */
-            if($k[0]==$env && array_key_exists($k[1], $keys)) {
-                $filtered[implode('-', $k)] = $v;
+                /**
+                 * First find the environment (test or live)
+                 */
+                if ($k[0] == $env && array_key_exists($k[1], $keys)) {
+                    $filtered[implode('-', $k)] = $v;
+                }
+
             }
-
         }
 
 

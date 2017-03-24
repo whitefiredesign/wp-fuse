@@ -1,7 +1,7 @@
 {
 
   "name": "whitefiredesign/wp-fuse",
-  "description" : "Fuse is a WordPress micro-framework that aims to simplify AJAX communication between the browser and WordPress ",
+  "description" : "Fuse is a micro-framework for WordPress developed by and for the devs @ White Fire Web Design.",
   "version": "0.0.1",
   "type": "library",
   "license": "MIT",
@@ -12,7 +12,8 @@
     "gkralik/php-uglifyjs": "^1.0.0",
     "stripe/stripe-php": "*",
     "auth0/auth0-php": "*",
-    "bramus/router": "*"
+    "bramus/router": "*",
+    "drewm/mailchimp-api": "^2.4"
   },
   "authors": [
     {

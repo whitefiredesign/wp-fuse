@@ -45,7 +45,10 @@ class __init__ {
             require_if_theme_supports('Fuse.Template',  __DIR__ .'/lib/Template/Template.php');
             require_if_theme_supports('Fuse.Stripe',    __DIR__ .'/lib/Stripe/Stripe.php');
             require_if_theme_supports('Fuse.Auth0',     __DIR__ .'/lib/Auth0/Auth0.php');
+            require_if_theme_supports('Fuse.MailChimp', __DIR__ .'/lib/MailChimp/MailChimp.php');
 
+
+            do_action('fuse-loaded');
         });
 
     }
