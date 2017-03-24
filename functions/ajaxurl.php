@@ -1,4 +1,7 @@
 <?php
+/**
+ * Prints the Ajax URL to the top of the document
+ */
 if(!function_exists('ajaxurl')) {
     function ajaxurl() {
         ?>

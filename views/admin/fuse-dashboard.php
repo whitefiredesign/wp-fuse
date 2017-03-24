@@ -3,17 +3,7 @@
 <div class="wrap">
     <h1>Welcome to Fuse</h1>
     <h2>Version - <?php echo config::$version; ?></h2>
-    <p>This is a WordPress microframework developed in-house by White Fire Web Design LTD.</p>
-    <p>It is intended to speed up our usual day-to-day development tasks.</p>
-    <p>At present, it contains the following modules</p>
-    <ol>
-        <li><b>Fuse.WP_Query (JavaScript)</b> - a way to request posts using WP_Query in JavaScript</li>
-        <li><b>Fuse.Template (JavaScript)</b> - a way to get a template part in JavaScript</li>
-        <li><b>Fuse.Stripe (PHP)</b> - Creates a dashboard and provides a library of useful functions that assists management of Stripe</li>
-        <li><b>Fuse.Auth0 (PHP)</b> - Creates a dashboard and provides a library of useful functions that assists management of Auth0</li>
-        <li><b>Fuse.Less (PHP)</b> - A way to compile Less files on-the-fly</li>
-        <li><b>Fuse.Uglify (PHP)</b> - A way to compress JavaScript files on-the-fly</li>
-    </ol>
+    <p>Fuse is a micro-framework for WordPress developed by and for the devs @ White Fire Web Design.</p>
     <h2>Copyright</h2>
     <p>Copyright © 2009 - <?php echo date('Y'); ?> White Fire Web Design LTD</p>
     <p>

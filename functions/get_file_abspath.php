@@ -1,4 +1,7 @@
 <?php
+/**
+ * Returns the files absolute path
+ */
 if(!function_exists('get_file_abspath')) {
     function get_file_abspath($file = __FILE__)
     {

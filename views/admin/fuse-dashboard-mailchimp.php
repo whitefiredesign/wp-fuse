@@ -5,7 +5,17 @@
 
 } else {
     $options = get_option('_mchimp_options');
-} ?>
+}
+
+
+/**
+ * Connect to MailChimp
+ */
+$MailChimp  = new MailChimp();
+$api        = $MailChimp->api;
+$lists      = $api->get('lists');
+
+?>
 
 <div class="wrap">
     <h1>Fuse Mailchimp</h1>
@@ -27,4 +37,24 @@
             <input name="submit" id="submit" class="button button-primary" value="Save Changes" type="submit">
         </p>
     </form>
+
+    <?php if($lists) { ?>
+    <h2>Lists</h2>
+    <table class="wp-list-table widefat fixed striped pages">
+        <thead>
+            <tr>
+                <th>ID</th><th>Name</th><th>Subscribers</th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php foreach($lists['lists'] as $list) { ?>
+            <tr>
+                <td><?php echo $list['id']; ?></td>
+                <td><?php echo $list['name']; ?></td>
+                <td><?php echo $list['stats']['member_count']; ?></td>
+            </tr>
+        <?php } ?>
+        </tbody>
+    </table>
+    <?php } ?>
 </div>
