@@ -6,6 +6,7 @@ class MailChimp {
     public static $slug = 'fuse-mailchimp';
     
     public $api;
+    public $list_id;
     
     public function __construct() {
         $options = self::get_options();
@@ -37,9 +38,9 @@ class MailChimp {
     }
 
     public static function get_options() {
-        $options    = get_option('_mchimp_options');
+        $options    = get_option('_mchimp_options', true);
 
-        if($options) {
+        if($options && is_array($options)) {
             foreach ($options as $k => $v) {
                 if ($v == '') {
                     unset($options[$k]);
@@ -49,7 +50,32 @@ class MailChimp {
             return $options;
         }
 
-        throw new \Exception("No options for MailChimp available");
+        return false;
+    }
+
+    public function insert($email, $merge_fields = false, $meta = false, $status = 'subscribed') {
+
+        $mc_data = array(
+            'email_address' => $email,
+            'status'        => $status,
+        );
+
+        $insert = $this->api->post("lists/".$this->list_id."/members", $mc_data);
+
+        if($merge_fields || $meta) {
+            $this->update($email, $merge_fields, $meta);
+        }
+
+        return $insert;
+    }
+
+    public function update($email, $merge_fields, $meta = false) {
+
+        $subscriber_hash = $this->api->subscriberHash($email);
+        return $this->api->patch("lists/$this->list_id/members/$subscriber_hash", array(
+            'merge_fields' => $merge_fields,
+            $meta,
+        ));
     }
     
 }

@@ -7,13 +7,16 @@
     $options = get_option('_mchimp_options');
 }
 
+$lists = false;
 
 /**
  * Connect to MailChimp
  */
 $MailChimp  = new MailChimp();
 $api        = $MailChimp->api;
-$lists      = $api->get('lists');
+if($api) {
+    $lists = $api->get('lists');
+}
 
 ?>
 

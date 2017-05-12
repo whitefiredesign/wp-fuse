@@ -10,7 +10,7 @@ namespace Fuse\Util;
  */
 class Less {
     
-    static function compile($file = false, $suffix='compiled', $force = false) {
+    static function compile($file = false, $suffix='compiled', $destination=false, $compress = false, $force = false) {
 
         if(!$file) {
             return false;
@@ -18,7 +18,23 @@ class Less {
 
         $less = new \lessc;
 
-        $less->checkedCompile($file, dirname($file) . '/' . basename($file, '.less') . '.'.$suffix.'.css');
+        if($compress) {
+            $less->setFormatter("compressed");
+        }
+
+        if(!$destination) {
+            $destination = dirname($file);
+        }
+
+        try {
+            if($force) {
+                $less->compileFile($file, $destination . '/' . basename($file, '.less') . '.' . $suffix . '.css');
+            } else {
+                $less->checkedCompile($file, $destination . '/' . basename($file, '.less') . '.' . $suffix . '.css');
+            }
+        } catch (\Exception $e) {
+            echo "fatal error: " . $e->getMessage();
+        }
 
         return false;
         

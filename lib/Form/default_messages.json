@@ -1,0 +1,12 @@
+{
+  "required_invalid"    : "Required",
+  "required_valid"      : "Value valid",
+  "email_invalid"       : "Email invalid",
+  "email_valid"         : "Email valid",
+  "telephone_invalid"   : "Telephone number invalid",
+  "telephone_valid"     : "Telephone valid",
+  "regex_invalid"       : "Error with this value",
+  "regex_valid"         : "Value valid",
+  "form_submit_success" : "Submission successful"
+}
+
