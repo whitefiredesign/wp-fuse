@@ -45,9 +45,43 @@ class Form_Helper {
      * @param $id / $name
      * @return array|null|object
      */
-    public function get_saved_data($id) {
+    public static function get_saved_data($id = false) {
         $db = new Form_Db();
         return $db->get_saved_data($id);
     }
     
+    /**
+     * Get the forms
+     */
+    public static function get_forms() {
+        $db = new Form_Db();
+        return $db->get_forms();
+    }
+
+    /**
+     * Modify the array to group the multifields into groups
+     */
+    public static function group_multival($fields_array) {
+
+        $multival = array();
+        
+        $i = 0;
+        foreach($fields_array as $field) {
+            if(isset($field['group'])) {
+                $multival[$field['group']][] = $field;
+                unset($fields_array[$i]);
+            }
+            $i++;
+        }
+
+        foreach($multival as $key => $val) {
+            $fields_array[] = array(
+                'name' => $key,
+                'data' => $val
+            );
+        }
+        
+
+        return $fields_array;
+    }
 }

@@ -8,6 +8,12 @@ MIT
 
 Version
 -------
+0.0.6
+* FORM : fixed textarea not getting set classes
+* FORM : added get_forms method
+* FORM : updated form admin view to include saved database logs
+* FORM : stopped logs from duplicating on save
+
 0.0.5
 * Updated general Dash to include list of supported Fuse modules
 * Added db_table_exists function

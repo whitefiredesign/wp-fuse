@@ -52,7 +52,7 @@ class Form_Builder extends Form_Helper {
         'submit'
     );
     private $submit_field   = '<button type="submit" id="%s" class="%s" name="%s" %s>%s</button>';
-    private $text_field     = '<textarea class="%s" id="%s" name="%s" placeholder="%s" %s %s>%s</textarea>';
+    private $text_field     = '<textarea id="%s" class="%s" name="%s" placeholder="%s" %s %s>%s</textarea>';
 
 
     /**
@@ -69,6 +69,7 @@ class Form_Builder extends Form_Helper {
 
 
     public $submit_success      = false;
+    public $saved               = false;
 
     /**
      * The form output
@@ -129,8 +130,10 @@ class Form_Builder extends Form_Helper {
                 $submit = $this->submit($fields);
                 if (!$submit['error']) {
 
-                    // Save the data to the db
-                    $this->save($post_request);
+                    if(!$this->saved) {
+                        // Save the data to the db
+                        $this->save($post_request);
+                    }
 
                     // Run the form success methods
                     $this->submit_success($values);
@@ -351,6 +354,7 @@ class Form_Builder extends Form_Helper {
 
         // Set submit success var to true
         $this->submit_success = true;
+        $this->saved          = true;
 
         // Add hook to catch output on submit
         return do_action('on_form_submit_success', array(

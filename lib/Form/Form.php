@@ -49,6 +49,35 @@ class Form extends Form_Builder {
                 include_once(config::$viewspath . 'admin/fuse-dashboard-form.php');
             });
         });
+
+        if(is_admin()) {
+            if (isset($_GET['page']) && $_GET['page']=='fuse-form') {
+
+                // jQuery UI
+                wp_enqueue_script('jquery-ui-core');
+                wp_enqueue_script('jquery-ui-tabs');
+                wp_enqueue_style('jquery-ui-theme', 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.min.css');
+                wp_enqueue_style('jquery-ui-base', 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/base/theme.min.css');
+
+                // Datatables
+                wp_enqueue_script('jquery-datatables', 'https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js', array('jquery'), config::$version, false);
+                wp_enqueue_script('jquery-datatables-jq-ui', 'https://cdn.datatables.net/1.10.15/js/dataTables.jqueryui.min.js', array('jquery'), config::$version, false);
+                wp_enqueue_style('jquery-datatables-theme', 'https://cdn.datatables.net/1.10.15/css/dataTables.jqueryui.min.css');
+
+            }
+        }
+    }
+
+
+    /**
+     * Helper hooks
+     */
+    public static function get_forms() {
+        return Form_Helper::get_forms();
+    }
+    
+    public static function get_saved_data($id = false) {
+        return Form_Helper::get_saved_data($id);
     }
     
 }

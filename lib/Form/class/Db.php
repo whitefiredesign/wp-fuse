@@ -36,6 +36,7 @@ class Form_Db {
           id      mediumint(10) NOT NULL AUTO_INCREMENT,
           form_id mediumint(10) NOT NULL,
           data    longtext NOT NULL,
+          time    datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
           UNIQUE KEY id (id)
      ) $charset_collate;";
 
@@ -139,10 +140,12 @@ class Form_Db {
             $wpdb->prefix.$this->form_save_table,
             array(
                 'form_id'   => $id,
-                'data'      => serialize($data)
+                'data'      => serialize($data),
+                'time'      => current_time( 'mysql' )
             ),
             array(
                 '%d',
+                '%s',
                 '%s'
             )
         );
@@ -156,14 +159,18 @@ class Form_Db {
      * @param $id / $name
      * @return array|null|object
      */
-    public function get_saved_data($id) {
+    public function get_saved_data($id = false) {
         global $wpdb;
         
         if(is_string($id)) {
             $id = $this->exists($id);
         }
 
-        $results        = $wpdb->get_results("SELECT * FROM $wpdb->prefix$this->form_save_table WHERE form_id=$id");
+        if(!$id) {
+            $results    = $wpdb->get_results("SELECT * FROM $wpdb->prefix$this->form_save_table");
+        } else {
+            $results    = $wpdb->get_results("SELECT * FROM $wpdb->prefix$this->form_save_table WHERE form_id=$id");
+        }
 
         $i = 0;
         foreach($results as $result) {
@@ -175,4 +182,35 @@ class Form_Db {
         return $results;
     }
 
+    /**
+     * Gets a list of the forms
+     * @return array|null|object
+     */
+    public function get_forms() {
+        global $wpdb;
+
+        $results    = $wpdb->get_results("SELECT * FROM $wpdb->prefix$this->form_register_table");
+
+        $i = 0;
+        foreach($results as $result) {
+            $results[$i]->fields = unserialize($results[$i]->fields);
+
+            unset($results[$i]->fields['config']);
+
+            $field_i = 0;
+            foreach($results[$i]->fields as $field) {
+                if($field['type']=='break' || $field['type']=='submit') {
+                    unset($results[$i]->fields[$field_i]);
+                }
+                $field_i ++;
+            }
+
+            $i++;
+        }
+
+        return $results;
+
+    }
+    
+    
 }
