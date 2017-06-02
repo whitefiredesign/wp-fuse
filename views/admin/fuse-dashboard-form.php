@@ -19,6 +19,7 @@ $forms = Form::get_forms();
     <div id="form-tabs">
         <ul>
             <li><a href="#sub-logs">Form Submission Logs</a></li>
+            <li><a href="#avail-forms">Available Forms</a></li>
         </ul>
 
         <div id="sub-logs">
@@ -80,6 +81,25 @@ $forms = Form::get_forms();
                     </div>
                 <?php } ?>
             </div>
+        </div>
+
+        <div id="avail-forms">
+            <table class="datatable display" cellspacing="0" width="100%">
+                <thead>
+                <tr>
+                    <td>ID</td><td>Name</td><td>Shortcode</td>
+                </tr>
+                </thead>
+                <tbody>
+                    <?php foreach($forms as $form) { ?>
+                        <tr>
+                            <td><?php echo $form->id; ?></td>
+                            <td><?php echo $form->name; ?></td>
+                            <td>[form name="<?php echo $form->name; ?>"]</td>
+                        </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
