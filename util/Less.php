@@ -16,25 +16,43 @@ class Less {
             return false;
         }
 
-        $less = new \lessc;
+        $cache_dir  = get_template_directory() . '/tmp/less/';
 
-        if($compress) {
-            $less->setFormatter("compressed");
-        }
+        $options    = array(
+            'cache_dir'=> $cache_dir,
+            'compress' => $compress,
+            'cache_method' => 'serialize'
+        );
 
-        if(!$destination) {
-            $destination = dirname($file);
-        }
 
-        try {
-            if($force) {
-                $less->compileFile($file, $destination . '/' . basename($file, '.less') . '.' . $suffix . '.css');
-            } else {
-                $less->checkedCompile($file, $destination . '/' . basename($file, '.less') . '.' . $suffix . '.css');
+        if($force) {
+
+            // If force compile is passed
+            try {
+                $parser = new \Less_Parser;
+                $parser->parseFile($file);
+                $css    = $parser->getCss();
+                file_put_contents($destination . '/' . basename($file, '.less') . '.' . $suffix . '.css', $css);
+            } catch(\Exception $e) {
+                print_r($e->getMessage());
             }
-        } catch (\Exception $e) {
-            echo "fatal error: " . $e->getMessage();
+
+        } else {
+
+            // Get styles from cache
+            try {
+                $files = array($file => get_stylesheet_directory_uri());
+                $vars = array(
+                    'fa-font-path' => '"' . get_relative_theme_uri() . '/fonts/"'
+                );
+                $css_file_name = \Less_Cache::Get($files, $options, $vars);
+                copy($options['cache_dir'] . $css_file_name, $destination . '/' . basename($file, '.less') . '.' . $suffix . '.css');
+
+            } catch (\Exception $e) {
+                print_r($e->getMessage());
+            }
         }
+
 
         return false;
         

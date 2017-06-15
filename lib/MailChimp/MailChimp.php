@@ -53,7 +53,7 @@ class MailChimp {
         return false;
     }
 
-    public function insert($email, $merge_fields = false, $meta = false, $status = 'subscribed') {
+    public function insert($email, $merge_fields = false, $status = 'pending') {
 
         $mc_data = array(
             'email_address' => $email,
@@ -62,8 +62,8 @@ class MailChimp {
 
         $insert = $this->api->post("lists/".$this->list_id."/members", $mc_data);
 
-        if($merge_fields || $meta) {
-            $this->update($email, $merge_fields, $meta);
+        if($merge_fields) {
+            $this->update($email, $merge_fields);
         }
 
         return $insert;

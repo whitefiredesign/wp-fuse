@@ -9,7 +9,7 @@ if(file_exists(__DIR__ . '/vendor/autoload.php')) {
 }
 
 class config {
-    public static $version  = '0.0.6-dev';
+    public static $version  = '0.0.8-dev';
     public static $dev      = true;
     public static $slug     = 'wp-fuse';
     public static $viewspath= __DIR__ . '/views/';
@@ -46,8 +46,8 @@ class __init__ {
         /**
          * Need to load immediately
          */
-
-
+        include_once __DIR__ . '/lib/Email.php';
+        
         add_action('init', function() {
             /**
              * Need to load after application loaded

@@ -211,6 +211,36 @@ class Form_Db {
         return $results;
 
     }
+
+    /**
+     * Return 1 form
+     * @param $name
+     * @return array|null|object|void
+     */
+    public function get_form($name, $sanitized = false) {
+        global $wpdb;
+
+        $form = $wpdb->get_row("SELECT * FROM $wpdb->prefix$this->form_register_table WHERE name='$name'");
+        if(!$form) {
+            return false;
+        }
+        
+        $form->fields = unserialize($form->fields); 
+
+        if($sanitized) {
+            unset($form->fields['config']);
+
+            $field_i = 0;
+            foreach ($form->fields as $field) {
+                if ($field['type'] == 'break' || $field['type'] == 'submit') {
+                    unset($form->fields[$field_i]);
+                }
+                $field_i++;
+            }
+        }
+
+        return $form;
+    }
     
     
 }

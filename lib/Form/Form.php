@@ -3,7 +3,6 @@ namespace Fuse;
 
 include_once(__DIR__ . '/class/Helper.php');
 include_once(__DIR__ . '/class/Db.php');
-include_once(__DIR__ . '/class/Email.php');
 include_once(__DIR__ . '/class/Builder.php');
 include_once(__DIR__ . '/class/Shortcode.php');
 

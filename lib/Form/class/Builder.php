@@ -42,7 +42,7 @@ class Form_Builder extends Form_Helper {
      * @var array
      */
     private $input_types    = array(
-        'text', 'email', 'telephone', 'checkbox', 'radio'
+        'text', 'email', 'telephone', 'checkbox', 'radio', 'hidden'
     );
     private $input_field    = '<input type="%s" id="%s" class="%s" name="%s" placeholder="%s" value="%s" %s %s/>';
     private $text_types     = array(
@@ -79,17 +79,22 @@ class Form_Builder extends Form_Helper {
     public function form() {
         global $post;
 
-        $output_html        = '<form method="post" action="">';
-        $output_html        .= '<input type="hidden" name="'.$this->name . '_submit'.'" value="1" />';
-        $output_html        .= '<input type="hidden" id="_fuse_submitting_' . $this->name .'" name="_fuse_submitting_' . $this->name .'" value="'.wp_create_nonce('_fuse_submitting_form').'" />';
-        $output_html        .= '<input type="hidden" name="_wp_http_referer" value="/'.$post->post_name.'/" />';
-        //$output_html        .= wp_nonce_field('_fuse_submitting_form', '_fuse_submitting_' . $this->name);
-
         $section_html       = '';
         $fields             = array_slice($this->fields,1);
         $array_count        = count($fields);
         $array_iterator     = 0;
         $section_iterator   = 0;
+
+        $output_html        = '<form 
+            method= "'.(isset($this->fields['config']['method'])    ? $this->fields['config']['method'] : 'post').'" 
+            action= "'.(isset($this->fields['config']['action'])    ? $this->fields['config']['action'] : '').'"
+            id=     "'.(isset($this->fields['config']['id'])        ? $this->fields['config']['id']     : '').'"
+
+            >';
+        $output_html        .= '<input type="hidden" name="'.$this->name . '_submit'.'" value="1" />';
+        $output_html        .= '<input type="hidden" id="_fuse_submitting_' . $this->name .'" name="_fuse_submitting_' . $this->name .'" value="'.wp_create_nonce('_fuse_submitting_form').'" />';
+        $output_html        .= '<input type="hidden" name="_wp_http_referer" value="/'.$post->post_name.'/" />';
+        //$output_html        .= wp_nonce_field('_fuse_submitting_form', '_fuse_submitting_' . $this->name);
 
         // Set array keys if not exists
         $i = 0;
@@ -347,9 +352,50 @@ class Form_Builder extends Form_Helper {
 
     public function submit_success($values) {
         // If send params have been set
-        if (isset($this->fields['config']['mail'])) {
-            $email = new Form_Email();
-            $email->data = $values;
+        if (isset($this->fields['config']['mail']) && $this->fields['config']['mail']) {
+
+            if(!$this->saved) {
+                
+                // lib/Email.php
+                $email = new Email();
+
+                if (isset($this->fields['config']['mail']['to'])) {
+                    $email->to = $this->fields['config']['mail']['to'];
+                }
+
+                if (isset($this->fields['config']['mail']['from'])) {
+                    $email->from = $this->fields['config']['mail']['from'];
+                }
+
+                if (isset($this->fields['config']['mail']['subject'])) {
+                    $email->subject = $this->fields['config']['mail']['subject'];
+                }
+
+                if (isset($this->fields['config']['mail']['cc'])) {
+                    $email->cc = $this->fields['config']['mail']['cc'];
+                }
+
+                if (isset($this->fields['config']['mail']['bcc'])) {
+                    $email->cc = $this->fields['config']['mail']['bcc'];
+                }
+
+                if (isset($this->fields['config']['mail']['body'])) {
+                    $email->body = $this->fields['config']['mail']['body'];
+                } else {
+
+                    // If no email body for form then send the fields
+                    $email->body = '';
+                    foreach ($values['post'] as $key => $value) {
+                        $email->body .= $value['label'] . ': ' . $value['value'] . "\n\n";
+                    }
+                }
+
+                if (isset($this->fields['config']['mail']['type'])) {
+                    $email->type = $this->fields['config']['mail']['type'];
+                }
+
+                $email->send();
+            }
         }
 
         // Set submit success var to true

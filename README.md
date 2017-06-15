@@ -8,11 +8,22 @@ MIT
 
 Version
 -------
+0.0.8
+* LIB\FORM : Added call form via shortcode [fuse-form name=""]
+* LIB\FORM : Added attributes 'method', 'action' and 'id' to form->config
+* LIB\FORM : Added hidden input field 
+* LIB\EMAIL : Added email class
+
+0.0.7
+* UTIL\LESS : Replaced library with less.php - https://github.com/oyejorge/less.php
+* UTIL\LESS : Fixed changes in @import files does not trigger a new compile
+* UTIL\LESS : Removed 'force' argument 
+
 0.0.6
-* FORM : fixed textarea not getting set classes
-* FORM : added get_forms method
-* FORM : updated form admin view to include saved database logs
-* FORM : stopped logs from duplicating on save
+* LIB\FORM : fixed textarea not getting set classes
+* LIB\FORM : added get_forms method
+* LIB\FORM : updated form admin view to include saved database logs
+* LIB\FORM : stopped logs from duplicating on save
 
 0.0.5
 * Updated general Dash to include list of supported Fuse modules
