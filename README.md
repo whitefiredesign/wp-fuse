@@ -9,6 +9,8 @@ MIT
 Version
 -------
 0.0.8
+* Added argument 'level' to wp_nav_menu
+* LESS : Added argument to accept vars
 * LIB\FORM : Added call form via shortcode [fuse-form name=""]
 * LIB\FORM : Added attributes 'method', 'action' and 'id' to form->config
 * LIB\FORM : Added hidden input field 
