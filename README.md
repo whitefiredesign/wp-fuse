@@ -8,6 +8,9 @@ MIT
 
 Version
 -------
+0.0.9
+* Code refactoring
+
 0.0.8
 * Added argument 'level' to wp_nav_menu
 * LESS : Added argument to accept vars
