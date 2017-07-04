@@ -37,7 +37,7 @@ class Form_Shortcode extends Form_Db {
             } else {
                 
                 // Run any script if specified
-                return '<script type="text/javascript">'.$atts['on-success'].'</script>';
+                return '<script type="text/javascript">'.html_entity_decode($atts['on-success']).'</script>';
             }
         }
     }
