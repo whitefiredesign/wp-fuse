@@ -11,7 +11,10 @@ class Form_Shortcode extends Form_Db {
         $atts = shortcode_atts(array(
             'name'          => false,
             'success-msg'   => __('Your submission was successful'),
-            'error-msg'     => __('Your submission was unsuccessful')
+            'error-msg'     => __('Your submission was unsuccessful'),
+            
+            // JS Code
+            'on-success'    => false
         ), $atts, 'fuse-form');
     
         if(!$atts['name']) {
@@ -28,7 +31,14 @@ class Form_Shortcode extends Form_Db {
         if(!$fm->form()->submit_success) {
             return $fm->form()->html;
         } else {
-            return \Fuse\wrap_notice('success', $atts['success-msg']);
+            
+            if(!$atts['error-msg']) {
+                return \Fuse\wrap_notice('success', $atts['success-msg']);
+            } else {
+                
+                // Run any script if specified
+                return '<script type="text/javascript">'.$atts['on-success'].'</script>';
+            }
         }
     }
 }

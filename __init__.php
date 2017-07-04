@@ -9,7 +9,7 @@ if(file_exists(__DIR__ . '/vendor/autoload.php')) {
 }
 
 class config {
-    public static $version  = '0.0.9-dev';
+    public static $version  = '0.0.10-dev';
     public static $dev      = true;
     public static $slug     = 'wp-fuse';
     public static $viewspath= __DIR__ . '/views/';
@@ -60,6 +60,9 @@ class __init__ {
             require_if_theme_supports('Fuse.Gmap',          __DIR__ .'/lib/Gmap/Gmap.php');
             require_if_theme_supports('Fuse.PopularPosts',  __DIR__ .'/lib/PopularPosts/PopularPosts.php');
             require_if_theme_supports('Fuse.Form',          __DIR__ .'/lib/Form/Form.php');
+
+            /* TODO: Menu Modules */
+            require_if_theme_supports('Fuse.Menu',          __DIR__ .'/lib/Menu/Menu.php');
 
 
             do_action('fuse-loaded');

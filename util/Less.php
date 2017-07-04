@@ -9,39 +9,54 @@ namespace Fuse\Util;
  *
  */
 class Less {
-    
+
     static function compile($file = false, $suffix='compiled', $vars=array(), $destination=false, $compress = false, $force = false) {
 
         if(!$file) {
             return false;
         }
 
-        $less = new \lessc;
+        $cache_dir  = get_template_directory() . '/tmp/less/';
 
-        if($compress) {
-            $less->setFormatter("compressed");
-        }
+        $options    = array(
+            'cache_dir'=> $cache_dir,
+            'compress' => $compress,
+            'cache_method' => 'serialize'
+        );
 
-        if(!$destination) {
-            $destination = dirname($file);
-        }
 
-        if(!empty($vars)) {
-            $less->setVariables($vars);
-        }
+        if($force) {
 
-        try {
-            if($force) {
-                $less->compileFile($file, $destination . '/' . basename($file, '.less') . '.' . $suffix . '.css');
-            } else {
-                $less->checkedCompile($file, $destination . '/' . basename($file, '.less') . '.' . $suffix . '.css');
+            // If force compile is passed
+            try {
+                $parser = new \Less_Parser;
+                $parser->parseFile($file);
+
+                if(!empty($vars)) {
+                    $parser->modifyVars($vars);
+                }
+
+                $css    = $parser->getCss();
+                file_put_contents($destination . '/' . basename($file, '.less') . '.' . $suffix . '.css', $css);
+            } catch(\Exception $e) {
+                print_r($e->getMessage());
             }
-        } catch (\Exception $e) {
-            echo "fatal error: " . $e->getMessage();
+
+        } else {
+
+            // Get styles from cache
+            try {
+                $files = array($file => get_stylesheet_directory_uri());
+                $css_file_name = \Less_Cache::Get($files, $options, $vars);
+                copy($options['cache_dir'] . $css_file_name, $destination . '/' . basename($file, '.less') . '.' . $suffix . '.css');
+
+            } catch (\Exception $e) {
+                print_r($e->getMessage());
+            }
         }
+
 
         return false;
-        
+
     }
 }
-

@@ -8,6 +8,10 @@ MIT
 
 Version
 -------
+0.0.10
+* LIB\FORM : Added success 'script' option to [fuse-form *]
+* Code refactoring
+
 0.0.9
 * Code refactoring
 
