@@ -1,9 +1,14 @@
 <?php namespace Fuse;
 
-function wrap_notice($type = false, $text) {
+function wrap_notice($classes = false, $text, $wrap = false) {
     if(!$text) {
         return false;
     }        
-    
-    return '<span class="'.$type.'">'.__($text).'</span>';
+
+    $string = '<span class="'.$classes.'">'.__($text).'</span>';
+    if($wrap) {
+        $string = sprintf($wrap, $string);        
+    }
+
+    return $string;
 }

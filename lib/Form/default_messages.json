@@ -7,6 +7,7 @@
   "telephone_valid"     : "Telephone valid",
   "regex_invalid"       : "Error with this value",
   "regex_valid"         : "Value valid",
+  "file_type_invalid"   : "File type invalid",
   "form_submit_success" : "Submission successful"
 }
 

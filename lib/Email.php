@@ -14,6 +14,7 @@ class Email {
     public $subject;
     public $cc  = array();
     public $bcc = array();
+    public $attachments = array();
 
     public $type    = 'text/plain';
 
@@ -51,7 +52,7 @@ class Email {
         if($this->type=='text/html') {
             add_filter('wp_mail_content_type', create_function('', 'return "text/html"; '));
         }
-        $email = wp_mail( $this->to, $this->subject, $this->body, $headers );
+        $email = wp_mail( $this->to, $this->subject, $this->body, $headers, $this->attachments);
         if($this->type=='text/html') {
             remove_filter('wp_mail_content_type', 'set_html_content_type');
         }

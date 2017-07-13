@@ -8,6 +8,13 @@ MIT
 
 Version
 -------
+0.0.11
+* LIB\FORM : Fixed 'undefined index' errors
+* LIB\FORM : Added new field parameter 'display_label' allowing option to hide label on fields
+* LIB\FORM : Added new field parameter 'label_email' allowing user to customise label output in email
+* LIB\FORM : Added new field parameter 'label_classes' to specify label classes
+* LIB\FORM : Added File support
+
 0.0.10
 * LIB\FORM : Added success 'script' option to [fuse-form *]
 * Code refactoring

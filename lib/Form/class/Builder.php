@@ -17,23 +17,27 @@ class Form_Builder extends Form_Helper {
      * @var array
      */
     private $keys = array(
-        'type'          => 'text',
-        'group'         => false,
-        'name'          => false,
-        'label'         => false,
-        'id'            => false,
-        'classes'       => false,
-        'container'     => '<div>%s</div>',
-        'wrap'          => '%s',
-        'html'          => '',
-        'placeholder'   => false,
-        'field_before'  => '',
-        'field_after'   => '',
-        'disabled'      => false,
-        'readonly'      => false,
-        'value'         => false,
-        'checked'       => false,
-        'validation'    => false
+        'type'              => 'text',
+        'group'             => false,
+        'name'              => false,
+        'label'             => false,
+        'label_email'       => false,
+        'label_display'     => true,
+        'label_classes'     => false,
+        'id'                => false,
+        'classes'           => false,
+        'container'         => '<div>%s</div>',
+        'wrap'              => '%s',
+        'html'              => '',
+        'placeholder'       => false,
+        'field_before'      => '',
+        'field_after'       => '',
+        'disabled'          => false,
+        'readonly'          => false,
+        'value'             => false,
+        'checked'           => false,
+        'validation'        => false,
+        'validation_display'=> true
     );
 
     /**
@@ -42,7 +46,7 @@ class Form_Builder extends Form_Helper {
      * @var array
      */
     private $input_types    = array(
-        'text', 'email', 'telephone', 'checkbox', 'radio', 'hidden'
+        'text', 'email', 'telephone', 'checkbox', 'radio', 'file', 'hidden'
     );
     private $input_field    = '<input type="%s" id="%s" class="%s" name="%s" placeholder="%s" value="%s" %s %s/>';
     private $text_types     = array(
@@ -60,10 +64,10 @@ class Form_Builder extends Form_Helper {
      * @var array
      */
     public $default_validate_classes = array(
-        'field_valid'       => '',
+        'field_valid'       => 'has-success',
         'field_invalid'     => 'has-error',
-        'message_valid'     => 'alert alert-success',
-        'message_invalid'   => 'alert alert-danger'
+        'message_valid'     => 'help-block alert alert-success',
+        'message_invalid'   => 'help-block alert alert-danger'
     );
     public $validate_classes    = array();
 
@@ -85,11 +89,22 @@ class Form_Builder extends Form_Helper {
         $array_iterator     = 0;
         $section_iterator   = 0;
 
+        // Check if there are file fields
+        $has_file_fields = false;
+        foreach($fields as $field) {
+            if($field['type']=='file') {
+                $has_file_fields =  true;
+                break;
+            }
+        }
+        //echo '<pre>';
+        //print_r($fields);
+        //echo '</pre>';
         $output_html        = '<form 
             method= "'.(isset($this->fields['config']['method'])    ? $this->fields['config']['method'] : 'post').'" 
             action= "'.(isset($this->fields['config']['action'])    ? $this->fields['config']['action'] : '').'"
             id=     "'.(isset($this->fields['config']['id'])        ? $this->fields['config']['id']     : '').'"
-
+            '.($has_file_fields ? 'enctype="multipart/form-data"' : '') .'
             >';
         $output_html        .= '<input type="hidden" name="'.$this->name . '_submit'.'" value="1" />';
         $output_html        .= '<input type="hidden" id="_fuse_submitting_' . $this->name .'" name="_fuse_submitting_' . $this->name .'" value="'.wp_create_nonce('_fuse_submitting_form').'" />';
@@ -164,17 +179,50 @@ class Form_Builder extends Form_Helper {
             if (in_array($field['type'], $this->input_types)) {
                 //$group = $this->
 
-                $field_html .= sprintf(
-                    $this->input_field,
-                    $field['type'],
-                    $field['id'],
-                    (is_array($field['classes']) ? implode(' ', $field['classes']) : ''),
-                    $this->name . '[' . ($field['name'] ? $field['name'] : $field['group']) . ']' . ($field['group'] ? '['.$field['id'].']' : ''),
-                    $field['placeholder'],
-                    ($field['group'] ? ($field['value'] ? $field['value'] : $field['value']='1') : trim($field['value'])),
-                    ($field['checked'] || ($field['group'] && isset($post_request[$field['group']]['value']) && array_key_exists($field['id'], $post_request[$field['group']]['value'])) ? 'checked="checked"' : ''),
-                    ($field['disabled'] ? 'disabled' : '').($field['readonly'] ? 'readonly' : '')
-                );
+                if($field['type']=='file') {
+
+                    // Generate a dummy field for collecting file info
+                    $field_html .= sprintf(
+                        $this->input_field,
+                        'hidden',
+                        $field['id'],
+                        '',
+                        $this->name . '[' . ($field['name'] ? $field['name'] : $field['group']) . ']' . ($field['group'] ? '['.$field['id'].']' : ''),
+                        '',
+                        '',
+                        '',
+                        ''
+                    );
+
+                    // Create the file field
+                    $field_html .= sprintf(
+                        $this->input_field,
+                        $field['type'],
+                        $field['id'] . '-fuse-form-file',
+                        (is_array($field['classes']) ? implode(' ', $field['classes']) : ''),
+                        $this->name . '[' . ($field['name'] ? $field['name'] : $field['group']) . '-fuse-form-file]' . ($field['group'] ? '['.$field['id'].'-fuse-form-file]' : ''),
+                        '',
+                        '',
+                        '',
+                        ''
+                    );
+
+                } else {
+
+                    $field_html .= sprintf(
+                        $this->input_field,
+                        $field['type'],
+                        $field['id'],
+                        (is_array($field['classes']) ? implode(' ', $field['classes']) : ''),
+                        $this->name . '[' . ($field['name'] ? $field['name'] : $field['group']) . ']' . ($field['group'] ? '[' . $field['id'] . ']' : ''),
+                        $field['placeholder'],
+                        ($field['group'] ? ($field['value'] ? $field['value'] : $field['value'] = '1') : trim($field['value'])),
+                        ($field['checked'] || ($field['group'] && isset($post_request[$field['group']]['value']) && array_key_exists($field['id'], $post_request[$field['group']]['value'])) ? 'checked="checked"' : ''),
+                        ($field['disabled'] ? 'disabled' : '') . ($field['readonly'] ? 'readonly' : '')
+                    );
+                }
+
+
             }
 
             // Textarea
@@ -208,12 +256,32 @@ class Form_Builder extends Form_Helper {
                 );
             }
 
+            // If label is displayed
+            if($field['label_display']) {
+
+                // If label classes not array, convert
+                if($field['label_classes'] && !is_array($field['label_classes'])) {
+                    $field['label_classes'] = array($field['label_classes']);
+                }
+
+                if($field['label_display']==='below') {
+                    $field_html = $field_html . '<label '.($field['label_classes'] ? 'class="'.implode(' ', $field['label_classes']) .'"' : '').' for="'.$field['id'] . ($field['type']==='file' ? '-fuse-form-file' : '') . '">' . $field['label'] . '</label>';
+                }
+                elseif($field['label_display']==='wrap') {
+                    $field_html = '<label '.($field['label_classes'] ? 'class="'.implode(' ', $field['label_classes']) .'"' : '').' for="'.$field['id'].'">' . $field_html . '' . $field['label'] . '</label>';
+                } else {
+                    $field_html = '<label '.($field['label_classes'] ? 'class="'.implode(' ', $field['label_classes']) .'"' : '').' for="'.$field['id'].'">' . $field['label'] . '</label>' . $field_html;
+                }
+            }
+
             $field_html     = sprintf($container, $field_html);
+
             $section_html   .= $field_html;
 
             // If there is a divider
-            $wrap_on = (int) $this->fields['config']['divider']['wrap_on'];
             if(isset($this->fields['config']['divider']) && !empty($this->fields['config']['divider'])) {
+                $wrap_on = (int) $this->fields['config']['divider']['wrap_on'];
+
                 $section_iterator++;
 
                 // If each section has reached number specified in divider
@@ -271,13 +339,13 @@ class Form_Builder extends Form_Helper {
 
             $big_item = array_key_value_search($fields, 'name', $key);
 
-            $nice_values[$key]['value']   = $val;
-            $nice_values[$key]['label']   = (isset($big_item[0]['label']) && $big_item[0]['label'] ? $big_item[0]['label'] : '');
-
+            if(!empty($big_item)) {
+                $nice_values[$key]['value'] = $val;
+                $nice_values[$key]['label'] = (isset($big_item[0]['label_email']) && $big_item[0]['label_email'] ? $big_item[0]['label_email'] : $big_item[0]['label']);
+            }
 
             $i++;
         }
-        
 
         return array(
             'post'      => $nice_values,
@@ -294,13 +362,14 @@ class Form_Builder extends Form_Helper {
     protected function submit($fields) {
 
         $error = false;
-
+        
         // Set default validation classes if not exists
         foreach(array_keys($this->default_validate_classes) as $key) {
             if(!isset($this->validate_classes[$key])) {
                 $this->validate_classes[$key] = $this->default_validate_classes[$key];
             }
         }
+
 
         $i = 0;
 
@@ -329,14 +398,22 @@ class Form_Builder extends Form_Helper {
 
                 $pvalidate['message'] = ($pvalidate['message'] ? $pvalidate['message'] : false);
 
-                if($pvalidate['message']) {
+                if($pvalidate['message'] && $field['validation_display']) {
+
+
+                    if($field['validation_display']==='below') {
+                        $key_segment = 'after';
+                    } else {
+                        $key_segment = 'before';
+                    }
+
                     $fields[$i]['messages'][] = $pvalidate['message'];
 
-                    $fields[$i]['field_before'] = $fields[$i]['field_before'] . '<ul class="' . $message_class . '">';
+                    $fields[$i]['field_'.$key_segment] = $fields[$i]['field_'.$key_segment] . '<ul class="' . $message_class . '">';
                     foreach ($pvalidate['message'] as $message) {
-                        $fields[$i]['field_before'] .= "<li>" . $message . "</li>";
+                        $fields[$i]['field_'.$key_segment] .= "<li>" . $message . "</li>";
                     }
-                    $fields[$i]['field_before'] .= '</ul>';
+                    $fields[$i]['field_'.$key_segment] .= '</ul>';
                 }
 
                 $i++;
@@ -389,6 +466,24 @@ class Form_Builder extends Form_Helper {
                         $email->body .= $value['label'] . ': ' . $value['value'] . "\n\n";
                     }
                 }
+
+                if(isset($_FILES[$this->name])) {
+                    $uploads_dir = wp_upload_dir();
+                    $uploads_dir = $uploads_dir['basedir'] . '/form-uploads';
+                    if (!file_exists($uploads_dir)) {
+                        mkdir($uploads_dir, 0777, true);
+                    }
+                    foreach ($_FILES[$this->name]["error"] as $key => $error) {
+                        if ($error == UPLOAD_ERR_OK) {
+                            $tmp_name = $_FILES[$this->name]["tmp_name"][$key];
+                            $name = basename($_FILES[$this->name]["name"][$key]);
+                            $path = "$uploads_dir/$name";
+                            move_uploaded_file($tmp_name, $path);
+                            $email->attachments[] = $path;
+                        }
+                    }
+                }
+
 
                 if (isset($this->fields['config']['mail']['type'])) {
                     $email->type = $this->fields['config']['mail']['type'];
@@ -473,6 +568,21 @@ class Form_Builder extends Form_Helper {
 
                 $output['valid']        = 0;
                 $output['message'][]    = $this->messages['regex_invalid'];
+            }
+        }
+
+        if(array_key_exists('types', $type) && $type['types']) {
+
+            // Check if file being uploaded is correct type
+            $uploads_dir    = wp_upload_dir();
+            $uploads_dir    = $uploads_dir['basedir'] . '/form-uploads';
+            $this_file_type = mime_content_type($uploads_dir.'/'.$val);
+
+            if(!in_array("$this_file_type", $type['types'])) {
+                $error = true;
+
+                $output['valid']        = 0;
+                $output['message'][]    = $this->messages['file_type_invalid'];
             }
         }
 

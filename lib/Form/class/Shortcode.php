@@ -9,13 +9,25 @@ class Form_Shortcode extends Form_Db {
 
     public function shortcode($atts) {
         $atts = shortcode_atts(array(
-            'name'          => false,
-            'success-msg'   => __('Your submission was successful'),
-            'error-msg'     => __('Your submission was unsuccessful'),
+            'name'              => false,
+            'success-msg'       => __('Your submission was successful'),
+            'error-msg'         => __('Your submission was unsuccessful'),
+            'validate_classes'  => array(),
             
             // JS Code
-            'on-success'    => false
+            'on-success'        => false
         ), $atts, 'fuse-form');
+
+        // If validate classes set
+        $validate_classes = false;
+        if($atts['validate_classes']) {
+            $atts['validate_classes'] = str_replace(array('{','}'), '', $atts['validate_classes']);
+            $temp = explode (',', $atts['validate_classes']);
+            foreach ($temp as $pair) {
+                list ($k,$v) = explode (':',$pair);
+                $validate_classes[trim($k)] = trim($v);
+            }
+        }
     
         if(!$atts['name']) {
             return \Fuse\wrap_notice('error', __('No form has been specified.'));
@@ -28,12 +40,17 @@ class Form_Shortcode extends Form_Db {
 
         $fm     = new Form($atts['name'], $form->fields, false);
 
+        // If validate classes set
+        if($validate_classes) {
+            $fm->validate_classes = $validate_classes;
+        }
+
         if(!$fm->form()->submit_success) {
             return $fm->form()->html;
         } else {
             
-            if(!$atts['error-msg']) {
-                return \Fuse\wrap_notice('success', $atts['success-msg']);
+            if(!$atts['on-success']) {
+                return \Fuse\wrap_notice('success bg-success', $atts['success-msg']);
             } else {
                 
                 // Run any script if specified

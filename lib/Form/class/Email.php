@@ -8,6 +8,7 @@ class Form_Email {
     public $subject;
     public $cc  = array();
     public $bcc = array();
+    public $attachments = false;
 
     public $type = 'text/plain';
 
@@ -41,6 +42,6 @@ class Form_Email {
             }
         }
 
-        wp_mail( $this->to, $this->subject, $this->template, $headers );
+        wp_mail( $this->to, $this->subject, $this->template, $headers, $this->attachments);
     }
 }
