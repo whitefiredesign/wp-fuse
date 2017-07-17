@@ -468,10 +468,23 @@ class Form_Builder extends Form_Helper {
                 }
 
                 if(isset($_FILES[$this->name])) {
+                    foreach ($_FILES[$this->name]["error"] as $key => $error) {
+                        if ($error == UPLOAD_ERR_OK) {
+                            $uploads_dir = wp_upload_dir();
+                            $uploads_dir = $uploads_dir['basedir'] . '/form-uploads';
+                            $name = basename($_FILES[$this->name]["name"][$key]);
+                            $path = "$uploads_dir/$name";
+                            $email->attachments[] = $path;
+                        }
+                    }
+                }
+
+                /*if(isset($_FILES[$this->name])) {
                     $uploads_dir = wp_upload_dir();
                     $uploads_dir = $uploads_dir['basedir'] . '/form-uploads';
+
                     if (!file_exists($uploads_dir)) {
-                        mkdir($uploads_dir, 0777, true);
+                        wp_mkdir_p($uploads_dir);
                     }
                     foreach ($_FILES[$this->name]["error"] as $key => $error) {
                         if ($error == UPLOAD_ERR_OK) {
@@ -482,7 +495,7 @@ class Form_Builder extends Form_Helper {
                             $email->attachments[] = $path;
                         }
                     }
-                }
+                }*/
 
 
                 if (isset($this->fields['config']['mail']['type'])) {
@@ -576,14 +589,36 @@ class Form_Builder extends Form_Helper {
             // Check if file being uploaded is correct type
             $uploads_dir    = wp_upload_dir();
             $uploads_dir    = $uploads_dir['basedir'] . '/form-uploads';
-            $this_file_type = mime_content_type($uploads_dir.'/'.$val);
-
-            if(!in_array("$this_file_type", $type['types'])) {
-                $error = true;
-
-                $output['valid']        = 0;
-                $output['message'][]    = $this->messages['file_type_invalid'];
+            if (!file_exists($uploads_dir)) {
+                wp_mkdir_p($uploads_dir);
             }
+
+            if(isset($_FILES[$this->name])) {
+                foreach($_FILES[$this->name]['type'] as $k => $v) {
+                    if(!in_array("$v", $type['types'])) {
+                        $error = true;
+
+                        $output['valid']        = 0;
+                        $output['message'][]    = $this->messages['file_type_invalid'];
+                    } else {
+                        foreach ($_FILES[$this->name]["error"] as $key => $error) {
+                            if ($error == UPLOAD_ERR_OK) {
+                                $tmp_name = $_FILES[$this->name]["tmp_name"][$key];
+                                $name = basename($_FILES[$this->name]["name"][$key]);
+                                $path = "$uploads_dir/$name";
+                                move_uploaded_file($tmp_name, $path);
+                            } else {
+                                $error = true;
+
+                                $output['valid']        = 0;
+                                $output['message'][]    = $error;
+                            }
+                        }
+                    }
+                }
+
+            }
+
         }
 
         if(!$error) {

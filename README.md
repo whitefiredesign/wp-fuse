@@ -8,6 +8,9 @@ MIT
 
 Version
 -------
+0.0.11.patch1
+* LIB\FORM : Fixed form file upload problem in Multisite
+
 0.0.11
 * LIB\FORM : Fixed 'undefined index' errors
 * LIB\FORM : Added new field parameter 'display_label' allowing option to hide label on fields
