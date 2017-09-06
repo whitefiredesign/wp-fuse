@@ -8,6 +8,10 @@ MIT
 
 Version
 -------
+0.0.12
+* LIB\FORM : Added Ajax Support
+* LIB\FORM : Date order in form submissions table (admin)
+
 0.0.11.patch1
 * LIB\FORM : Fixed form file upload problem in Multisite
 

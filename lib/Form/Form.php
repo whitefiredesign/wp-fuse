@@ -12,7 +12,7 @@ class Form extends Form_Builder {
     public static $slug     = 'fuse-form';
     
     
-    public function __construct($name = false, $fields = false, $update = false) {
+    public function __construct($name = false, $fields = array(), $update = false, $ajax = false) {
 
         $db         = new Form_Db();
         
@@ -23,10 +23,25 @@ class Form extends Form_Builder {
             // If creating a form
 
             // Assigned in Form_Builder
-            $this->name     = $name;
-            $this->fields   = $fields;
-            $this->messages = json_decode(file_get_contents(__DIR__ . '/default_messages.json'), true);
-            $this->_id      = $db->exists($this->name);
+            $this->name             = $name;
+            $this->fields           = $fields;
+            $this->messages         = json_decode(file_get_contents(__DIR__ . '/default_messages.json'), true);
+            $this->ajax             = $ajax;
+            $this->_id              = $db->exists($this->name);
+
+            // Assign default value to submit
+            $i=0;
+            foreach($this->fields as $k => $v) {
+                // Ignore config
+                if($k=='config') {
+                } else {
+                    $i++;
+                    if($v['type']=='submit') {
+                        $this->fields[$i]['name'] = $this->name.'_submit_btn';
+                    }
+                }
+            }
+
 
             // Check if form is in DB
             if($this->_id) {
@@ -40,6 +55,7 @@ class Form extends Form_Builder {
             }
 
         }
+
     }
     
 
@@ -68,6 +84,21 @@ class Form extends Form_Builder {
         }
     }
 
+    public static function assets() {
+
+        if(config::$dev) {
+            Util\Uglify::compile_single(__DIR__ . '/scripts/Form_Ajax.js',                  'min');
+            Util\Uglify::compile_single(__DIR__ . '/scripts/jquery-serialize-object.js',    'min');
+
+        }
+
+        wp_register_script('Fuse.Form_Ajax', get_file_abspath(__FILE__) . '/scripts/Form_Ajax.min.js', array('jquery'), config::$version, true);
+        wp_register_script('serialize-object', get_file_abspath(__FILE__) . '/scripts/jquery-serialize-object.min.js', array('jquery'), config::$version, true);
+
+        wp_enqueue_script('serialize-object');
+        wp_enqueue_script('Fuse.Form_Ajax');
+    }
+
 
     /**
      * Helper hooks
@@ -79,6 +110,34 @@ class Form extends Form_Builder {
     public static function get_saved_data($id = false) {
         return Form_Helper::get_saved_data($id);
     }
+
+    public static function a_fuse_form_submit() {
+        if(isset($_REQUEST['data'])) {
+            
+            $fields = Form_Helper::get_form($_REQUEST['data']['form_name']);
+
+            $_POST  = $_REQUEST['data'];
+
+            $fm     = new Form($_REQUEST['data']['form_name'], $fields->fields, false, true);
+            $fm->submit_success = (bool) $fm->submit_success;
+
+            $messages = array(
+                'success' => \Fuse\wrap_notice('success bg-success', $fields->fields['config']['shortcode_atts']['success-msg'])
+            );
+
+            echo wp_json_encode(array(
+                'form_html'     => $fm->form()->html,
+                'form_db'       => $fm,
+                'form_data'     => $_REQUEST['data'],
+                'form_fields'   => $fields->fields,
+                'form_messages' => $messages,
+                'post'          => $_POST,
+                'submit_success'=> $fm->submit_success
+            ));
+        }
+
+        wp_die();
+    }
     
 }
 
@@ -87,5 +146,9 @@ $support = get_theme_support( 'Fuse.Form' );
 if($support) {
     Form::dashboard();
 
+    add_action( 'wp_ajax_a_fuse_form_submit',           '\Fuse\Form::a_fuse_form_submit' );
+    add_action( 'wp_ajax_nopriv_a_fuse_form_submit',    '\Fuse\Form::a_fuse_form_submit' );
+
+    add_action( 'wp_enqueue_scripts', '\Fuse\Form::assets');
     new Form();
 }

@@ -15,7 +15,8 @@ class Form_Shortcode extends Form_Db {
             'validate_classes'  => array(),
             
             // JS Code
-            'on-success'        => false
+            'on-success'        => false,
+            'ajax'              => false
         ), $atts, 'fuse-form');
 
         // If validate classes set
@@ -38,7 +39,13 @@ class Form_Shortcode extends Form_Db {
             return \Fuse\wrap_notice('error', __('Form "'.$atts['name'].'" does not appear to exist.'));
         }
 
-        $fm     = new Form($atts['name'], $form->fields, false);
+        $update = false;
+        if($atts['ajax']) {
+            $update = true;
+            $form->fields['config']['shortcode_atts'] = $atts;
+        }
+
+        $fm     = new Form($atts['name'], $form->fields, $update, $atts['ajax'], $atts);
 
         // If validate classes set
         if($validate_classes) {

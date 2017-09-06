@@ -8,7 +8,9 @@ $forms = Form::get_forms();
     jQuery( function($) {
         $( "#form-tabs" ).tabs();
         $('#form-log-drilldown').tabs();
-        $('.datatable').DataTable();
+        $('.datatable').DataTable({
+            "order": [[ 0, "desc" ]]
+        });
     });
 </script>
 
@@ -38,6 +40,7 @@ $forms = Form::get_forms();
                         <table class="datatable display" cellspacing="0" width="100%">
                             <thead>
                                 <tr>
+                                    <th>Time</th>
                                     <?php foreach($form->fields as $field) { ?>
                                         <?php if(isset($field['name'])) { ?>
                                             <th><?php echo $field['name']; ?></th>
@@ -55,6 +58,7 @@ $forms = Form::get_forms();
                                 //echo '</pre>';
                                 ?>
                                 <tr>
+                                    <td data-order="<?php echo strtotime($log->time);?>"><?php echo \Fuse\time_format($log->time); ?></td>
                                     <?php foreach($form->fields as $field) {
                                         if(isset($field['name'])) {
                                             $value = $data[$field['name']];

@@ -59,6 +59,14 @@ class Form_Helper {
     }
 
     /**
+     * Get a single form
+     */
+    public static function get_form($name, $sanitized = false) {
+        $db = new Form_Db();
+        return $db->get_form($name, $sanitized);
+    }
+
+    /**
      * Modify the array to group the multifields into groups
      */
     public static function group_multival($fields_array) {

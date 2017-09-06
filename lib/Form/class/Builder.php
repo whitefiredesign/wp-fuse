@@ -7,6 +7,7 @@ class Form_Builder extends Form_Helper {
     
     public $fields      = array(array());
     public $name;
+    public $ajax;
     public $break;
 
     protected $messages;
@@ -46,7 +47,7 @@ class Form_Builder extends Form_Helper {
      * @var array
      */
     private $input_types    = array(
-        'text', 'email', 'telephone', 'checkbox', 'radio', 'file', 'hidden'
+        'text', 'email', 'password', 'telephone', 'checkbox', 'radio', 'file', 'hidden'
     );
     private $input_field    = '<input type="%s" id="%s" class="%s" name="%s" placeholder="%s" value="%s" %s %s/>';
     private $text_types     = array(
@@ -55,7 +56,7 @@ class Form_Builder extends Form_Helper {
     private $submit_types   = array(
         'submit'
     );
-    private $submit_field   = '<button type="submit" id="%s" class="%s" name="%s" %s>%s</button>';
+    private $submit_field   = '<button type="submit" id="%s" class="%s" name="%s" value="%s" %s>%s</button>';
     private $text_field     = '<textarea id="%s" class="%s" name="%s" placeholder="%s" %s %s>%s</textarea>';
 
 
@@ -82,6 +83,7 @@ class Form_Builder extends Form_Helper {
      */
     public function form() {
         global $post;
+        global $wp;
 
         $section_html       = '';
         $fields             = array_slice($this->fields,1);
@@ -104,12 +106,21 @@ class Form_Builder extends Form_Helper {
             method= "'.(isset($this->fields['config']['method'])    ? $this->fields['config']['method'] : 'post').'" 
             action= "'.(isset($this->fields['config']['action'])    ? $this->fields['config']['action'] : '').'"
             id=     "'.(isset($this->fields['config']['id'])        ? $this->fields['config']['id']     : '').'"
-            '.($has_file_fields ? 'enctype="multipart/form-data"' : '') .'
+            class=  "fuse-form '.(isset($this->fields['config']['classes']) && is_array($this->fields['config']['classes'])  ? implode(' ', $this->fields['config']['classes']) : '').'" 
+            '.($this->ajax ? ' data-ajax="true"' : '') .'
+            '.($has_file_fields ? ' enctype="multipart/form-data"' : '') .'
             >';
         $output_html        .= '<input type="hidden" name="'.$this->name . '_submit'.'" value="1" />';
         $output_html        .= '<input type="hidden" id="_fuse_submitting_' . $this->name .'" name="_fuse_submitting_' . $this->name .'" value="'.wp_create_nonce('_fuse_submitting_form').'" />';
-        $output_html        .= '<input type="hidden" name="_wp_http_referer" value="/'.$post->post_name.'/" />';
+        $output_html        .= '<input type="hidden" name="_wp_http_referer" value="'.(is_object($post) ? $post->post_name : home_url( $wp->request )).'/" />';
+        $output_html        .= '<input type="hidden" name="form_name" value="'.$this->name.'" />';
+        if($this->ajax) {
+            $output_html    .= '<input type="hidden" name="'.$this->name . '_submit" value="true" />';
+        }
         //$output_html        .= wp_nonce_field('_fuse_submitting_form', '_fuse_submitting_' . $this->name);
+        if(isset($this->fields['config']['wrap_start'])) {
+            $output_html    .= $this->fields['config']['wrap_start'];
+        }
 
         // Set array keys if not exists
         $i = 0;
@@ -245,15 +256,24 @@ class Form_Builder extends Form_Helper {
 
             // Submit
             if ($field['type']=='submit') {
+                //ob_start();
+                //echo '<pre>';
+                //print_r($field);
+                //echo '</pre>';
+                //$contents = ob_get_contents();
+                //ob_end_clean();
+                //$field_html .= $contents;
+
                 $field_html .= sprintf(
                     $this->submit_field,
                     $field['id'],
                     (is_array($field['classes']) ? implode(' ', $field['classes']) : ''),
-                    $this->name . '[' . ($field['name'] ? $field['name'] : $this->name.'_submit_btn') . ']',
-                    $field['placeholder'],
+                    $this->name . '[' . ($field['name']) . ']',
                     $field['value'],
-                    ($field['disabled'] ? 'disabled' : '')
+                    ($field['disabled'] ? 'disabled' : ''),
+                    $field['value']
                 );
+
             }
 
             // If label is displayed
@@ -309,10 +329,21 @@ class Form_Builder extends Form_Helper {
 
         }
 
+        if(isset($this->fields['config']['wrap_end'])) {
+            $output_html    .= $this->fields['config']['wrap_end'];
+        }
+
         $output_html    .= '</form>';
+
+        /*if($this->ajax) {
+            $output_html .= $this->ajax($this->name);
+
+        }*/
+
         return json_decode(json_encode(array(
             'html'              => $output_html,
-            'submit_success'    => $this->submit_success
+            'submit_success'    => $this->submit_success,
+            'ajax'              => $this->ajax
         ), FALSE));
     }
 
@@ -327,6 +358,16 @@ class Form_Builder extends Form_Helper {
         $values         = $_POST[$this->name];
         $nice_values    = array();
         $i              = 0;
+
+        // remove numeric keys if they exist
+        foreach($values as $index => $v) {
+            if(is_int($index)) {
+                foreach($v as $key => $val) {
+                    $values[$key] = $val; 
+                }
+            }
+        }
+
         foreach($values as $key=>$val) {
             foreach($fields as $index => $field) {
                 $values[$key] = array(
@@ -421,13 +462,15 @@ class Form_Builder extends Form_Helper {
         }
 
         return array(
-            'error'     => $error,
-            'fields'    => $fields
+            'error'             => $error,
+            'fields'            => $fields,
+            'ajax'              => $this->ajax
         );
 
     }
 
     public function submit_success($values) {
+
         // If send params have been set
         if (isset($this->fields['config']['mail']) && $this->fields['config']['mail']) {
 
@@ -463,7 +506,9 @@ class Form_Builder extends Form_Helper {
                     // If no email body for form then send the fields
                     $email->body = '';
                     foreach ($values['post'] as $key => $value) {
-                        $email->body .= $value['label'] . ': ' . $value['value'] . "\n\n";
+                        if(!is_array($value['value'])) {
+                            $email->body .= $value['label'] . ': ' . $value['value'] . "\n\n";
+                        }
                     }
                 }
 
@@ -501,8 +546,9 @@ class Form_Builder extends Form_Helper {
                 if (isset($this->fields['config']['mail']['type'])) {
                     $email->type = $this->fields['config']['mail']['type'];
                 }
-
+                
                 $email->send();
+
             }
         }
 
@@ -647,6 +693,31 @@ class Form_Builder extends Form_Helper {
     }
 
 
+    /**
+     * Adds the Ajax functionality
+     */
+    /*public function ajax($name) {
+        return '<script type="text/javascript">
+                    jQuery(function($) {
+
+                        var data = {
+                            "action"    : "fuse_form",
+                            "form-name" : "'.$name.'"
+                        };
+
+                        $.post("'.admin_url('admin-ajax.php').'", data, function(res) {
+                            console.log(res);
+                        });
+
+                    });
+                </script>';
+    }
+
+    public function fuse_form() {
+        echo 'hello world';
+
+        die();
+    } */
 
 
 

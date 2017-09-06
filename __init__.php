@@ -9,7 +9,7 @@ if(file_exists(__DIR__ . '/vendor/autoload.php')) {
 }
 
 class config {
-    public static $version  = '0.0.11-dev';
+    public static $version  = '0.0.12-dev';
     public static $dev      = true;
     public static $slug     = 'wp-fuse';
     public static $viewspath= __DIR__ . '/views/';

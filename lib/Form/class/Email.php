@@ -42,6 +42,7 @@ class Form_Email {
             }
         }
 
-        wp_mail( $this->to, $this->subject, $this->template, $headers, $this->attachments);
+        $response = wp_mail( $this->to, $this->subject, $this->template, $headers, $this->attachments);
+        
     }
 }
