@@ -8,6 +8,9 @@ MIT
 
 Version
 -------
+0.0.12.patch1
+* LIB\FORM : Add Password Field
+
 0.0.12
 * LIB\FORM : Added Ajax Support
 * LIB\FORM : Date order in form submissions table (admin)
