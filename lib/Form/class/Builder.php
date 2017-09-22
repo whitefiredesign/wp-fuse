@@ -558,8 +558,9 @@ class Form_Builder extends Form_Helper {
 
         // Add hook to catch output on submit
         return do_action('on_form_submit_success', array(
-            'name' => $this->name,
-            'data' => $values
+            'name'  => $this->name,
+            'data'  => $values,
+            'ajax'  => $this->ajax
         ));
     }
 
@@ -584,6 +585,7 @@ class Form_Builder extends Form_Helper {
             return $output;
         }
 
+        // Validate required field
         if(array_key_exists('required', $type) && $type['required']) {
 
             // Check if value is in field
@@ -596,6 +598,7 @@ class Form_Builder extends Form_Helper {
 
         }
 
+        // Validate email field
         if(array_key_exists('email', $type) && $type['email']) {
 
             // Check if email is valid
@@ -607,6 +610,7 @@ class Form_Builder extends Form_Helper {
             }
         }
 
+        // Validate telephone field
         if(array_key_exists('telephone', $type) && $type['telephone']) {
 
             // Check if telephone is valid
@@ -619,6 +623,41 @@ class Form_Builder extends Form_Helper {
 
         }
 
+        // Validate minLength field
+        if(array_key_exists('minLength', $type) && $type['minLength']) {
+            if(strlen($val)<$type['minLength']) {
+                $error = true;
+
+                $output['valid']        = 0;
+                $output['message'][]    = sprintf($this->messages['minLength_invalid'], $type['minLength']);
+            }
+        }
+
+        // Validate match field
+        if(array_key_exists('match', $type) && $type['match']) {
+
+            $compare = $_POST[$this->name][$type['match']];
+
+            if($this->ajax) {
+                foreach($_POST[$this->name] as $k => $v) {
+                    if($k==$type['match']) {
+                        $compare = $v[$type['match']];
+
+                        break;
+                    }
+                }
+            }
+
+            if($val!==$compare) {
+                $error = true;
+
+                $output['valid']        = 0;
+                $output['message'][]    = $this->messages['match_invalid'];
+            }
+
+        }
+
+        // Validate regex field
         if(array_key_exists('regex', $type) && $type['regex']) {
             
             // Check custom regex
@@ -630,6 +669,7 @@ class Form_Builder extends Form_Helper {
             }
         }
 
+        // Validate file types field
         if(array_key_exists('types', $type) && $type['types']) {
 
             // Check if file being uploaded is correct type
@@ -671,6 +711,9 @@ class Form_Builder extends Form_Helper {
             $output['valid']            = 1;
             $output['message']          = false;
         }
+
+        $output['debug'] = $type;
+
 
         return $output;
     }

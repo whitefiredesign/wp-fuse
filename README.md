@@ -8,6 +8,15 @@ MIT
 
 Version
 -------
+0.0.13.patch1
+* LIB\MAILCHIMP : Add subscribe and unsubscribe method
+* LIB\FORM : Add form submission viewport move offset
+* LIB\FORM : Add 'minLength' validation condition
+
+0.0.13
+* Added index.php
+* LIB\FORM : Add 'match' validation condition
+
 0.0.12.patch1
 * LIB\FORM : Add Password Field
 

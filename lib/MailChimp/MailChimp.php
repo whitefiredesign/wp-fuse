@@ -53,8 +53,32 @@ class MailChimp {
         return false;
     }
 
-    public function insert($email, $merge_fields = false, $status = 'pending') {
+    /**
+     * Check if email already exists in MC
+     * 
+     * @param $email
+     * @return bool
+     */
+    public function check_exists($email) {
+        $subscriber_hash    = $this->api->subscriberHash($email);
+        $result = $this->api->get("lists/$this->list_id/members/$subscriber_hash");
+        
+        if($result['status']=='404') {
+            return false;
+        }
+        
+        return true;
+    }
 
+    /**
+     * Inserts a new subscriber to 'Pending'
+     *
+     * @param $email
+     * @param bool $merge_fields
+     * @param string $status
+     * @return array|false
+     */
+    public function insert($email, $merge_fields = false, $status = 'pending') {
         $mc_data = array(
             'email_address' => $email,
             'status'        => $status,
@@ -69,6 +93,48 @@ class MailChimp {
         return $insert;
     }
 
+    /**
+     * Sets subscriber to 'Unsubscribed'
+     *
+     * @param $email
+     * @return array|false
+     */
+    public function unsubscribe($email) {
+        $mc_data = array(
+            'status'        => 'unsubscribed'
+        );
+
+        $subscriber_hash    = $this->api->subscriberHash($email);
+        $unsubscribe        = $this->api->patch("lists/".$this->list_id."/members/".$subscriber_hash, $mc_data);
+
+        return $unsubscribe;
+    }
+
+    /**
+     * Sets subscriber to 'Subscribed'
+     *
+     * @param $email
+     * @return array|false
+     */
+    public function subscribe($email) {
+        $mc_data = array(
+            'status'        => 'subscribed'
+        );
+
+        $subscriber_hash = $this->api->subscriberHash($email);
+        $subscribe = $this->api->patch("lists/".$this->list_id."/members/".$subscriber_hash, $mc_data);
+        
+        return $subscribe;
+    }
+
+    /**
+     * Updates subscriber meta data
+     *
+     * @param $email
+     * @param $merge_fields
+     * @param bool $meta
+     * @return array|false
+     */
     public function update($email, $merge_fields, $meta = false) {
 
         $subscriber_hash = $this->api->subscriberHash($email);
