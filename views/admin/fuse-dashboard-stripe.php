@@ -65,6 +65,15 @@ if(isset($keys)) {
                     <input id="live-publishable-key" class="regular-text" name="stripe[live-publishable-key]" type="text" value="<?= ($options['live-publishable-key'] ? $options['live-publishable-key'] : "") ?>">
                 </td>
             </tr>
+            <tr>
+                <th scope="row">
+                    <label for="test-or-live">Test or Live</label>
+                </th>
+                <td>
+                    <label for="test-mode"><input type="radio" id="test-mode" name="stripe[mode]" value="test" <?= ($options['mode'] == 'test' ? "checked" : "") ?>>Test</label>
+                    <label for="live-mode"><input type="radio" id="live-mode" name="stripe[mode]" value="live" <?= ($options['mode'] == 'live' ? "checked" : "") ?>>Live</label>
+                </td>
+            </tr>
             </tbody>
         </table>
         <p class="submit">

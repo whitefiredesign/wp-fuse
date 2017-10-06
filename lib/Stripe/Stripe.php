@@ -4,6 +4,49 @@ namespace Fuse;
 class Stripe {
 
     public static $slug = 'fuse-stripe';
+
+    public function __construct() {
+        add_action('wp_head', array($this, 'print_publishable_key'));
+        add_action('wp_head', function() {
+            echo '<script type="text/javascript" src="https://js.stripe.com/v1/?1"></script>';
+        });
+    }
+
+    public function print_publishable_key() {
+        $opts = $this->get_options();
+
+        if(isset($opts['mode']) && $opts['mode']!=='') {
+            if ($opts['mode'] == 'test') {
+                if(isset($opts['test-publishable-key']) && $opts['test-publishable-key']!=='') {
+                    echo '<script>stripe_publishable_key="' . $opts['test-publishable-key'] . '"</script>';
+                }
+            }
+
+            if ($opts['mode'] == 'live') {
+                if(isset($opts['live-publishable-key']) && $opts['test-publishable-key']!=='') {
+                    echo '<script>stripe_publishable_key="' . $opts['live-publishable-key'] . '"</script>';
+                }
+            }
+        }
+    }
+
+    public static function get_secret_key() {
+        $opts = self::get_options();
+
+        if(isset($opts['mode']) && $opts['mode']!=='') {
+            if ($opts['mode'] == 'test') {
+                if(isset($opts['test-secret-key']) && $opts['test-secret-key']!=='') {
+                    return $opts['test-secret-key'];
+                }
+            }
+
+            if ($opts['mode'] == 'live') {
+                if(isset($opts['live-secret-key']) && $opts['live-secret-key']!=='') {
+                    return $opts['live-secret-key'];
+                }
+            }
+        }
+    }
     
     public static function dashboard() {
         add_action( 'admin_menu', function() {
@@ -97,4 +140,5 @@ class Stripe {
 $support = get_theme_support( 'Fuse.Stripe' );
 if($support) {
     Stripe::dashboard();
+    new Stripe();
 }

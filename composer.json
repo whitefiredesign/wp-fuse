@@ -2,7 +2,7 @@
 
   "name": "whitefiredesign/wp-fuse",
   "description" : "Fuse is a micro-framework for WordPress developed by and for the devs @ White Fire Web Design.",
-  "version": "0.0.12-dev",
+  "version": "0.0.14",
   "type": "library",
   "license": "MIT",
   "require": {
