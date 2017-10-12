@@ -8,6 +8,9 @@ MIT
 
 Version
 -------
+0.0.15
+* Added Branding
+
 0.0.14
 * LIB\TEMPLATE : Added ability to set extension to template
 * LIB\STRIPE : Return secret key `Stripe::get_secret_key()`

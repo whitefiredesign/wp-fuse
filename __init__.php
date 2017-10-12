@@ -13,6 +13,7 @@ class config {
     public static $dev      = true;
     public static $slug     = 'wp-fuse';
     public static $viewspath= __DIR__ . '/views/';
+    public static $fusedir  = '/vendor/whitefiredesign/wp-fuse';
 }
 
 class __init__ {
@@ -33,6 +34,11 @@ class __init__ {
          * Autoload fixes
          */
         $this->_fix();
+
+        /**
+         * Publish assets
+         */
+        $this->_assets();
 
         /**
          * Ready admin Fuse
@@ -80,6 +86,10 @@ class __init__ {
 
     private function _fix() {
         $this->_load('fix');
+    }
+    
+    private function _assets() {
+        $this->_load('assets');
     }
 
     private function _load($dir) {

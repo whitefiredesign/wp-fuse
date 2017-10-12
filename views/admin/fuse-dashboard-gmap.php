@@ -9,7 +9,7 @@
 
 ?>
 
-<div class="wrap">
+<div class="wrap fuse">
     <h1>Fuse Gmap</h1>
 
     <form method="post" action="">
@@ -26,7 +26,7 @@
         </table>
 
         <p class="submit">
-            <input name="submit" id="submit" class="button button-primary" value="Save Changes" type="submit">
+            <input name="submit" id="submit" class="button fuse-branded" value="Save Changes" type="submit">
         </p>
     </form>
     

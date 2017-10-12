@@ -15,7 +15,7 @@ $forms = Form::get_forms();
 </script>
 
 
-<div class="wrap">
+<div class="wrap fuse">
     <h1>Fuse Form</h1>
 
     <div id="form-tabs">
