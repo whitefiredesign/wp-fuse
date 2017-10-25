@@ -8,10 +8,12 @@ MIT
 
 Version
 -------
-0.0.15
-* Added Branding
-
 0.0.14
+* LIB\FORM : Fixed cc and bcc sending options
+* LIB\FORM : Created 'mail' config in admin 
+* LIB\FORM : Fixed table in admin when new fields created
+* LIB\FORM : Added ability to send message
+* Added Branding
 * LIB\TEMPLATE : Added ability to set extension to template
 * LIB\STRIPE : Return secret key `Stripe::get_secret_key()`
 * LIB\STRIPE : Echo publishable key

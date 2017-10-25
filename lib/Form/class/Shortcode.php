@@ -7,7 +7,7 @@ class Form_Shortcode extends Form_Db {
         add_shortcode( 'fuse-form', array($this, 'shortcode'));
     }
 
-    public function shortcode($atts) {
+    public function shortcode($a) {
         $atts = shortcode_atts(array(
             'name'              => false,
             'success-msg'       => __('Your submission was successful'),
@@ -17,7 +17,7 @@ class Form_Shortcode extends Form_Db {
             // JS Code
             'on-success'        => false,
             'ajax'              => false
-        ), $atts, 'fuse-form');
+        ), $a, 'fuse-form');
 
         // If validate classes set
         $validate_classes = false;
@@ -43,6 +43,9 @@ class Form_Shortcode extends Form_Db {
         if($atts['ajax']) {
             $update = true;
             $form->fields['config']['shortcode_atts'] = $atts;
+            //echo '<pre>';
+            //print_r($form->fields['config']['shortcode_atts']);
+            //echo '</pre>';
         }
 
         $fm     = new Form($atts['name'], $form->fields, $update, $atts['ajax'], $atts);
@@ -55,13 +58,22 @@ class Form_Shortcode extends Form_Db {
         if(!$fm->form()->submit_success) {
             return $fm->form()->html;
         } else {
+
+            //ob_start();
+            //echo '<pre>' . print_r($fm) . '</pre>';
+            //$contents = ob_get_contents();
+            //ob_end_clean();
+
+            $on_success = false;
+            if($atts['on-success']) {
+                $on_success = $atts['on-success'];
+            }
             
-            if(!$atts['on-success']) {
-                return \Fuse\wrap_notice('success bg-success', $atts['success-msg']);
-            } else {
-                
+            if(!$on_success) {
                 // Run any script if specified
-                return '<script type="text/javascript">'.html_entity_decode($atts['on-success']).'</script>';
+                return '<script type="text/javascript">' . $atts['on-success'] . '</script>';
+            } else {
+                return \Fuse\wrap_notice('success bg-success', $atts['success-msg']);
             }
         }
     }

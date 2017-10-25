@@ -8,6 +8,7 @@ class Form_Builder extends Form_Helper {
     public $fields      = array(array());
     public $name;
     public $ajax;
+    public $scatts;
     public $break;
 
     protected $messages;
@@ -343,7 +344,8 @@ class Form_Builder extends Form_Helper {
         return json_decode(json_encode(array(
             'html'              => $output_html,
             'submit_success'    => $this->submit_success,
-            'ajax'              => $this->ajax
+            'ajax'              => $this->ajax,
+            'scatts'            => $this->scatts
         ), FALSE));
     }
 
@@ -496,15 +498,19 @@ class Form_Builder extends Form_Helper {
                 }
 
                 if (isset($this->fields['config']['mail']['bcc'])) {
-                    $email->cc = $this->fields['config']['mail']['bcc'];
+                    $email->bcc = $this->fields['config']['mail']['bcc'];
+                }
+
+                $email->body = '';
+                if (isset($this->fields['config']['mail']['message'])) {
+                    $email->body .= $this->fields['config']['mail']['message'];
                 }
 
                 if (isset($this->fields['config']['mail']['body'])) {
-                    $email->body = $this->fields['config']['mail']['body'];
+                    $email->body .= $this->fields['config']['mail']['body'];
                 } else {
 
                     // If no email body for form then send the fields
-                    $email->body = '';
                     foreach ($values['post'] as $key => $value) {
                         if(!is_array($value['value'])) {
                             $email->body .= $value['label'] . ': ' . $value['value'] . "\n\n";
@@ -558,9 +564,10 @@ class Form_Builder extends Form_Helper {
 
         // Add hook to catch output on submit
         return do_action('on_form_submit_success', array(
-            'name'  => $this->name,
-            'data'  => $values,
-            'ajax'  => $this->ajax
+            'name'      => $this->name,
+            'data'      => $values,
+            'ajax'      => $this->ajax,
+            'scatts'    => $this->scatts
         ));
     }
 

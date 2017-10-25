@@ -12,7 +12,7 @@ class Form extends Form_Builder {
     public static $slug     = 'fuse-form';
     
     
-    public function __construct($name = false, $fields = array(), $update = false, $ajax = false) {
+    public function __construct($name = false, $fields = array(), $update = false, $ajax = false, $atts = false) {
 
         $db         = new Form_Db();
         
@@ -27,6 +27,7 @@ class Form extends Form_Builder {
             $this->fields           = $fields;
             $this->messages         = json_decode(file_get_contents(__DIR__ . '/default_messages.json'), true);
             $this->ajax             = $ajax;
+            $this->scatts           = $atts;
             $this->_id              = $db->exists($this->name);
 
             // Assign default value to submit
@@ -122,7 +123,8 @@ class Form extends Form_Builder {
             $fm->submit_success = (bool) $fm->submit_success;
 
             $messages = array(
-                'success' => \Fuse\wrap_notice('success bg-success', $fields->fields['config']['shortcode_atts']['success-msg'])
+                'success'       => \Fuse\wrap_notice('success bg-success', $fields->fields['config']['shortcode_atts']['success-msg']),
+                'on-success'    => $fields->fields['config']['shortcode_atts']['on-success']
             );
 
             echo wp_json_encode(array(
