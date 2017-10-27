@@ -69,12 +69,13 @@ class Form_Shortcode extends Form_Db {
                 $on_success = $atts['on-success'];
             }
             
-            if(!$on_success) {
+            if($on_success) {
                 // Run any script if specified
                 return '<script type="text/javascript">' . $atts['on-success'] . '</script>';
-            } else {
-                return \Fuse\wrap_notice('success bg-success', $atts['success-msg']);
             }
+
+            return \Fuse\wrap_notice('success bg-success', $atts['success-msg']);
+
         }
     }
 }

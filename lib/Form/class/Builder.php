@@ -131,6 +131,21 @@ class Form_Builder extends Form_Helper {
                     $fields[$i][$key] = $this->keys[$key];
                 }
             }
+
+            // If multi
+            if(($field['type']=='checkbox' || $field['type']=='select') && $field['multi']) {
+                foreach(array_keys($this->keys) as $key) {
+                    $m = 0;
+                    foreach($fields[$i]['values'] as $multi) {
+                        if(!isset($fields[$i]['values'][$m][$key])) {
+                            $fields[$i]['values'][$m][$key] = $this->keys[$key];
+                        }
+
+                        $m++;
+                    }
+                }
+            }
+
             $i++;
         }
 
@@ -192,6 +207,7 @@ class Form_Builder extends Form_Helper {
                 //$group = $this->
 
                 if($field['type']=='file') {
+                    // If field is file
 
                     // Generate a dummy field for collecting file info
                     $field_html .= sprintf(
@@ -218,6 +234,37 @@ class Form_Builder extends Form_Helper {
                         '',
                         ''
                     );
+
+                } elseif($field['type']=='checkbox' && $field['multi']) {
+                    // If field is checkbox array
+                    foreach($field['values'] as $checkbox) {
+
+                        // Ensure name is set to avoid error
+                        if(!isset($post_request[$field['name']]['value'])) {
+                            $post_request[$field['name']]['value'] = array();
+                        }
+
+                        // Ensure value is array for multi's
+                        if(is_string($post_request[$field['name']]['value'])) {
+                            $post_request[$field['name']]['value'] = explode(", ", $post_request[$field['name']]['value']);
+                        }
+
+                        $field_html .= $checkbox['field_before'] . '<label for="'.$checkbox['id'].'"> ' . sprintf(
+                            $this->input_field,
+                            $field['type'],
+                            $checkbox['id'],
+                            (isset($checkbox['classes']) && is_array($checkbox['classes']) ? implode(' ', $checkbox['classes']) : ''),
+                            $this->name . '[' . ($field['name'] ? $field['name'] : '') . '][]',
+                            '',
+                            ($checkbox['value'] ? $checkbox['value'] : '1'),
+                            (($checkbox['checked']) || (in_array($checkbox['value'], $post_request[$field['name']]['value'])) ? 'checked="checked"' : ''),
+                            ($checkbox['disabled'] ? 'disabled' : '') . ($checkbox['readonly'] ? 'readonly' : '')
+                        ) . ''.$checkbox['label'] .  '</label>' . $checkbox['field_after'];
+
+                        if($this->ajax) {
+                            $field_html .= '<input type="hidden" name="'.$this->name . '[' . ($field['name'] ? $field['name'] : '') . '][]'.'" value="">';
+                        }
+                    }
 
                 } else {
 
@@ -257,13 +304,6 @@ class Form_Builder extends Form_Helper {
 
             // Submit
             if ($field['type']=='submit') {
-                //ob_start();
-                //echo '<pre>';
-                //print_r($field);
-                //echo '</pre>';
-                //$contents = ob_get_contents();
-                //ob_end_clean();
-                //$field_html .= $contents;
 
                 $field_html .= sprintf(
                     $this->submit_field,
@@ -345,6 +385,7 @@ class Form_Builder extends Form_Helper {
             'html'              => $output_html,
             'submit_success'    => $this->submit_success,
             'ajax'              => $this->ajax,
+            // shortcode atts
             'scatts'            => $this->scatts
         ), FALSE));
     }
@@ -372,9 +413,7 @@ class Form_Builder extends Form_Helper {
 
         foreach($values as $key=>$val) {
             foreach($fields as $index => $field) {
-                $values[$key] = array(
-
-                );
+                $values[$key] = array();
                 if($field['name']==$key) {
                     $fields[$index]['value'] = $val;
                 }
@@ -510,10 +549,15 @@ class Form_Builder extends Form_Helper {
                     $email->body .= $this->fields['config']['mail']['body'];
                 } else {
 
+
                     // If no email body for form then send the fields
                     foreach ($values['post'] as $key => $value) {
-                        if(!is_array($value['value'])) {
-                            $email->body .= $value['label'] . ': ' . $value['value'] . "\n\n";
+                        if(!is_int($key)) {
+                            if (is_array($value['value'])) {
+                                $email->body .= $value['label'] . ': ' . implode(', ', $value['value']) . "\n\n";
+                            } else {
+                                $email->body .= $value['label'] . ': ' . $value['value'] . "\n\n";
+                            }
                         }
                     }
                 }
@@ -596,7 +640,7 @@ class Form_Builder extends Form_Helper {
         if(array_key_exists('required', $type) && $type['required']) {
 
             // Check if value is in field
-            if(empty($val) || trim($val)=='' || !$val) {
+            if((is_string($val) && trim($val)=='') || (empty($val)) || !$val) {
                 $error = true;
 
                 $output['valid']        = 0;
