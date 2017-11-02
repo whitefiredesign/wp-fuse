@@ -1,0 +1,28 @@
+.row {
+  -moz-column-width: 26em;
+  -webkit-column-width: 26em;
+  column-width:26em;
+  -moz-column-gap: .5em;
+  -webkit-column-gap: .5em;
+  column-gap:.5em;
+
+  .col {
+    display: inline-block;
+    margin:  0.25rem;
+    padding:  1rem;
+    width:  100%;
+  }
+
+  &.full {
+    -moz-column-width: inherit;
+    -webkit-column-width: inherit;
+    column-width:inherit;
+  }
+
+  &.half {
+    -moz-column-width: 36em;
+    -webkit-column-width: 36em;
+    column-width:36em;
+  }
+}
+

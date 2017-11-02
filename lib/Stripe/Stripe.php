@@ -1,7 +1,10 @@
 <?php
 namespace Fuse;
 
-class Stripe {
+include_once(__DIR__ . '/class/Helper.php');
+
+
+class Stripe extends Stripe_Helper {
 
     public static $slug = 'fuse-stripe';
 
@@ -10,6 +13,31 @@ class Stripe {
         add_action('wp_head', function() {
             echo '<script type="text/javascript" src="https://js.stripe.com/v1/?1"></script>';
         });
+
+        // Set the publishable key
+        $this->set_key();
+    }
+
+    private function set_key() {
+
+        try {
+            $key = Stripe::get_keys(array(
+                'secret'   => true
+            ), self::get_mode());
+
+            if($key) {
+                foreach($key as $k => $v) {
+                    $key = $v;
+                    break;
+                }
+
+            }
+
+            \Stripe\Stripe::setApiKey($key);
+        } catch(\Exception $e) {
+            echo $e->getMessage();
+        }
+
     }
 
     public function print_publishable_key() {
@@ -54,8 +82,50 @@ class Stripe {
                 include_once(config::$viewspath . 'admin/fuse-dashboard-stripe.php');
             });
         });
+
+        if(is_admin()) {
+            if (isset($_GET['page']) && $_GET['page']=='fuse-stripe') {
+
+                // jQuery UI
+                wp_enqueue_script('jquery-ui-core');
+                wp_enqueue_script('jquery-ui-tabs');
+                wp_enqueue_script('jquery-ui-dialog');
+                wp_enqueue_script('jquery-ui-datepicker');
+                wp_enqueue_style('jquery-ui-theme', 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.min.css');
+                wp_enqueue_style('jquery-ui-base', 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/base/theme.min.css');
+
+                // Datatables
+                wp_enqueue_script('jquery-datatables', 'https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js', array('jquery'), config::$version, false);
+                wp_enqueue_script('jquery-datatables-jq-ui', 'https://cdn.datatables.net/1.10.15/js/dataTables.jqueryui.min.js', array('jquery'), config::$version, false);
+                wp_enqueue_style('jquery-datatables-theme', 'https://cdn.datatables.net/1.10.15/css/dataTables.jqueryui.min.css');
+
+            }
+        }
     }
-    
+
+    /**
+     * Public JS & CSS
+     */
+    public static function assets() {
+
+
+    }
+
+    /**
+     * Admin JS & CSS
+     */
+    public static function assets_admin() {
+
+        if(is_admin()) {
+            if (config::$dev) {
+                Util\Uglify::compile_single(__DIR__ . '/scripts/Stripe_Admin.js', 'min');
+            }
+
+            wp_register_script('Fuse.Stripe_Admin', get_file_abspath(__FILE__) . '/scripts/Stripe_Admin.min.js', array('jquery'), config::$version, true);
+
+            wp_enqueue_script('Fuse.Stripe_Admin');
+        }
+    }
 
     public static function save_options($options) {
         update_option('_stripe_options', $options);
@@ -140,5 +210,10 @@ class Stripe {
 $support = get_theme_support( 'Fuse.Stripe' );
 if($support) {
     Stripe::dashboard();
+
+    add_action( 'admin_enqueue_scripts', '\Fuse\Stripe::assets_admin');
+    
     new Stripe();
+    include_once(__DIR__ . '/class/Ajax.php');
+
 }

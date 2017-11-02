@@ -16,4 +16,14 @@ jQuery(function($) {
             });
         });
     }
+
+    /**
+     * Tabs
+     */
+    var tabEls = $('.fuse-tabs');
+    if(tabEls.length>0) {
+        tabEls.each(function() {
+            $(this).tabs();
+        });
+    }
 });

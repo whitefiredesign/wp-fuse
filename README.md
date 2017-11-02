@@ -9,7 +9,6 @@ MIT
 Version
 -------
 0.0.14
-* LIB\FORM : Added multi checkbox option
 * LIB\FORM : Fixed cc and bcc sending options
 * LIB\FORM : Created 'mail' config in admin 
 * LIB\FORM : Fixed table in admin when new fields created
