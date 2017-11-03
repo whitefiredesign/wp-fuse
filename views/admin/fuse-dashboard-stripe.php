@@ -40,9 +40,16 @@ if(isset($keys)) {
         </div>
     </div>
 
-    <!-- Modal Boxes -->
-    <?php include_once(__DIR__ . '/subs/Stripe/admin-dialog-add-coupon.php'); ?>
-    <?php include_once(__DIR__ . '/subs/Stripe/admin-dialog-add-plan.php'); ?>
+    <!-- Dialog Boxes -->
+    
+    <!-- Coupons -->
+    <?php include_once(__DIR__ . '/subs/Stripe/dialog/admin-dialog-add-coupon.php'); ?>
+    <?php include_once(__DIR__ . '/subs/Stripe/dialog/admin-dialog-delete-coupon.php'); ?>
+
+    <!-- Plans -->
+    <?php include_once(__DIR__ . '/subs/Stripe/dialog/admin-dialog-add-plan.php'); ?>
+    
+    <!-- / Dialog Boxes -->
 </div>
 
 

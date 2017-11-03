@@ -4,7 +4,21 @@ namespace Fuse;
 class Js {
 
     public function __construct() {
+        // Always include admin scripts
         add_action('admin_enqueue_scripts', array($this, 'admin_branding'));
+
+        // Register others
+        add_action('admin_enqueue_scripts', array($this, 'register_admin'));
+        add_action('wp_enqueue_scripts',    array($this, 'register_public'));
+
+    }
+
+    public function register_admin() {
+        wp_register_script( 'Fuse.jq-serialize-object', get_stylesheet_directory_uri() . config::$fusedir . '/assets/lib/jquery-serialize-object/dist/jquery.serialize-object.min.js', array('jquery'), VERSION);
+    }
+
+    public function register_public() {
+        wp_register_script( 'Fuse.jq-serialize-object', get_stylesheet_directory_uri() . config::$fusedir . '/assets/lib/jquery-serialize-object/dist/jquery.serialize-object.min.js', array('jquery'), VERSION, true);
     }
 
     public function admin_branding() {

@@ -35,7 +35,7 @@ class Stripe_Helper {
         $data = self::get_available_plans(false);
 
         ob_start();
-        include_once(config::$viewspath . 'admin/subs/Stripe/admin-subscriptions-available-plans.php');
+        include_once(config::$viewspath . 'admin/subs/Stripe/table/admin-subscriptions-available-plans.php');
         $template = ob_get_contents();
         ob_end_clean();
 
@@ -78,7 +78,7 @@ class Stripe_Helper {
         $data = self::get_available_coupons(false);
 
         ob_start();
-        include_once(config::$viewspath . 'admin/subs/Stripe/admin-subscriptions-available-coupons.php');
+        include_once(config::$viewspath . 'admin/subs/Stripe/table/admin-subscriptions-available-coupons.php');
         $template = ob_get_contents();
         ob_end_clean();
 
@@ -122,7 +122,7 @@ class Stripe_Helper {
         $data = self::add_customers_to_subscriptions(self::get_subscription_list(false), self::get_customer_list(false));
 
         ob_start();
-        include_once(config::$viewspath . 'admin/subs/Stripe/admin-subscriptions-subscription-list.php');
+        include_once(config::$viewspath . 'admin/subs/Stripe/table/admin-subscriptions-subscription-list.php');
         $template = ob_get_contents();
         ob_end_clean();
 
@@ -166,7 +166,7 @@ class Stripe_Helper {
         $data = self::get_customer_list(false);
 
         ob_start();
-        include_once(config::$viewspath . 'admin/subs/Stripe/admin-subscriptions-customer-list.php');
+        include_once(config::$viewspath . 'admin/subs/Stripe/table/admin-subscriptions-customer-list.php');
         $template = ob_get_contents();
         ob_end_clean();
 
@@ -178,6 +178,46 @@ class Stripe_Helper {
         return $template;
     }
 
+    /**
+     * Create a coupon
+     * @param $data
+     * @return array|bool
+     */
+    public static function create_coupon($data) {
+
+        try {
+            $output = self::sanitize_response(\Stripe\Coupon::create($data));
+
+            return json_decode($output);
+        } catch(\Exception $e) {
+            $output = array('error' => $e->getMessage());
+
+            return $output;
+        }
+        
+    }
+
+    /**
+     * Delete a coupon
+     * @param $id
+     * @return array|bool
+     */
+    public static function delete_coupon($id) {
+
+        try {
+            $coupon = \Stripe\Coupon::retrieve($id);
+            $output = $coupon->delete();
+
+            return json_decode($output);
+        } catch(\Exception $e) {
+            $output = array('error' => $e->getMessage());
+
+            return $output;
+        }
+
+    }
+
+    
     /**
      * Adds the customer object to each subscription
      * @param array $subscriptions
@@ -207,6 +247,44 @@ class Stripe_Helper {
         $mode = $options['mode'];
 
         return $mode;
+    }
+    
+    public static function prepare_request($object) {
+        // Regex for checking date format dd-mm-yy
+        $date_regex = '/^[0-9]{2}-[0-9]{2}-[0-9]{2}$/';
+
+        foreach($object as $k => $v) {
+
+            // Unset keys with no values
+            if($v=='') {
+                unset($object[$k]);
+            }
+
+            // Convert string numbers to integers
+            if(is_numeric($v)) {
+                $v = (int) $v;
+                $object[$k] = $v;
+            }
+
+            // Unset keys with 0 value
+            if($v===0) {
+                unset($object[$k]);
+            }
+
+            // Remove nonce
+            if($k=='nonce') {
+                unset($object[$k]);
+            }
+
+            // Convert dates to timestamps
+            if(preg_match($date_regex, $v)) {
+                $date       = trim($v);
+                $bits       = explode("-", $date);
+                $object[$k] = strtotime($bits[1]. '/' . $bits[0] . '/' . $bits[2]);
+            }
+        }
+        
+        return $object;
     }
 
     /**

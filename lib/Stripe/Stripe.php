@@ -118,11 +118,16 @@ class Stripe extends Stripe_Helper {
 
         if(is_admin()) {
             if (config::$dev) {
-                Util\Uglify::compile_single(__DIR__ . '/scripts/Stripe_Admin.js', 'min');
+                Util\Uglify::compile_single(__DIR__ . '/scripts/admin-coupon.js',   'min');
+                Util\Uglify::compile_single(__DIR__ . '/scripts/admin-plan.js',     'min');
+                Util\Uglify::compile_single(__DIR__ . '/scripts/Stripe_Admin.js',   'min');
             }
 
-            wp_register_script('Fuse.Stripe_Admin', get_file_abspath(__FILE__) . '/scripts/Stripe_Admin.min.js', array('jquery'), config::$version, true);
+            wp_register_script('Fuse.Stripe_admin-coupon',  get_file_abspath(__FILE__) . '/scripts/admin-coupon.min.js', array('jquery'), config::$version, true);
+            wp_register_script('Fuse.Stripe_Admin',         get_file_abspath(__FILE__) . '/scripts/Stripe_Admin.min.js', array('jquery'), config::$version, true);
 
+            wp_enqueue_script('Fuse.jq-serialize-object');
+            wp_enqueue_script('Fuse.Stripe_admin-coupon');
             wp_enqueue_script('Fuse.Stripe_Admin');
         }
     }

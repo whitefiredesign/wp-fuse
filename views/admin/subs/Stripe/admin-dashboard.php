@@ -17,17 +17,8 @@
     <div class="row half">
         <div class="col">
             <div class="panel panel-default">
-                <div class="panel-heading">Plans <button data-new="plan" class="invoke-dialog alignright button header-new"><span class="dashicons dashicons-plus-alt"></span> NEW</button></div>
+                <div class="panel-heading">Plans <button data-dialog="add-plan" class="invoke-dialog alignright button header-new"><span class="dashicons dashicons-plus-alt"></span> NEW</button></div>
                 <div class="panel-body available-plans">
-                    <p class="aligncenter"><img src="<?php echo admin_url('/images/spinner-2x.gif'); ?>" /><br />Please wait...</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col">
-            <div class="panel panel-default">
-                <div class="panel-heading">Coupons <button data-new="coupon" class="invoke-dialog alignright button header-new"><span class="dashicons dashicons-plus-alt"></span> NEW</button></div>
-                <div class="panel-body available-coupons">
                     <p class="aligncenter"><img src="<?php echo admin_url('/images/spinner-2x.gif'); ?>" /><br />Please wait...</p>
                 </div>
             </div>
@@ -43,5 +34,15 @@
         </div>
     </div>
 
+    <div class="row full">
+        <div class="col">
+            <div class="panel panel-default">
+                <div class="panel-heading">Coupons <button data-dialog="add-coupon" class="invoke-dialog alignright button header-new"><span class="dashicons dashicons-plus-alt"></span> NEW</button></div>
+                <div class="panel-body available-coupons">
+                    <p class="aligncenter"><img src="<?php echo admin_url('/images/spinner-2x.gif'); ?>" /><br />Please wait...</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>

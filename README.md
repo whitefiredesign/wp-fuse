@@ -9,6 +9,7 @@ MIT
 Version
 -------
 0.0.14
+* LIB\STRIPE : Lots of updates
 * LIB\FORM : Fixed cc and bcc sending options
 * LIB\FORM : Created 'mail' config in admin 
 * LIB\FORM : Fixed table in admin when new fields created
