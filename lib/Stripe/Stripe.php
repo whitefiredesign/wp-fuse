@@ -123,11 +123,19 @@ class Stripe extends Stripe_Helper {
                 Util\Uglify::compile_single(__DIR__ . '/scripts/Stripe_Admin.js',   'min');
             }
 
-            wp_register_script('Fuse.Stripe_admin-coupon',  get_file_abspath(__FILE__) . '/scripts/admin-coupon.min.js', array('jquery'), config::$version, true);
-            wp_register_script('Fuse.Stripe_Admin',         get_file_abspath(__FILE__) . '/scripts/Stripe_Admin.min.js', array('jquery'), config::$version, true);
+            wp_register_script('Fuse.Stripe_admin-coupon',  get_file_abspath(__FILE__) . '/scripts/admin-coupon.min.js',    array('jquery'), config::$version, true);
+            wp_register_script('Fuse.Stripe_admin-plan',    get_file_abspath(__FILE__) . '/scripts/admin-plan.min.js',      array('jquery'), config::$version, true);
+            wp_register_script('Fuse.Stripe_Admin',         get_file_abspath(__FILE__) . '/scripts/Stripe_Admin.min.js',    array('jquery'), config::$version, true);
+            $translation_array = array(
+                'admin_url' => admin_url(),
+            );
+            wp_localize_script( 'Fuse.Stripe_Admin', 'WP', $translation_array );
 
             wp_enqueue_script('Fuse.jq-serialize-object');
+            wp_enqueue_script('Fuse.noty-js');
+            wp_enqueue_style('Fuse.noty-css');
             wp_enqueue_script('Fuse.Stripe_admin-coupon');
+            wp_enqueue_script('Fuse.Stripe_admin-plan');
             wp_enqueue_script('Fuse.Stripe_Admin');
         }
     }

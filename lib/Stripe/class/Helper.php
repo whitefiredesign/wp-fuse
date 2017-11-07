@@ -1,7 +1,7 @@
 <?php namespace Fuse; ?>
 
 <?php
-class Stripe_Helper {
+class Stripe_Helper  {
 
     /**
      * Returns an object of available plans
@@ -217,7 +217,45 @@ class Stripe_Helper {
 
     }
 
-    
+    /**
+     * Create a plan
+     * @param $data
+     * @return array|bool
+     */
+    public static function create_plan($data) {
+
+        try {
+            $output = self::sanitize_response(\Stripe\Plan::create($data));
+
+            return json_decode($output);
+        } catch(\Exception $e) {
+            $output = array('error' => $e->getMessage());
+
+            return $output;
+        }
+
+    }
+
+    /**
+     * Delete a plan
+     * @param $id
+     * @return array|bool
+     */
+    public static function delete_plan($id) {
+
+        try {
+            $plan = \Stripe\Plan::retrieve(trim($id));
+            $output = $plan->delete();
+
+            return json_decode($output);
+        } catch(\Exception $e) {
+            $output = array('error' => $e->getMessage());
+
+            return $output;
+        }
+
+    }
+
     /**
      * Adds the customer object to each subscription
      * @param array $subscriptions
@@ -296,6 +334,26 @@ class Stripe_Helper {
         }
 
         return json_encode($response->data);
+
+    }
+
+
+
+    /**
+     * Coupons
+     */
+    public static function get_coupon_meta($id, $key) {
+        global $wpdb;
+
+    }
+
+    public static function update_coupon_meta($id, $key, $value) {
+        global $wpdb;
+
+    }
+
+    public static function delete_coupon_meta($id, $key) {
+        global $wpdb;
 
     }
 }

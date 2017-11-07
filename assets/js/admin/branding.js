@@ -1,3 +1,5 @@
+var Fuse = {};
+
 jQuery(function($) {
 
     /**
@@ -25,5 +27,26 @@ jQuery(function($) {
         tabEls.each(function() {
             $(this).tabs();
         });
+    }
+
+    /**
+     * In window alert
+     */
+    Fuse.inWindowAlert = function(position, state, message) {
+        $('.fuse-alert-window').remove();
+        var html = $('<div class="fuse-alert-window ' + position + ' ' + state + '">' + message + '</div>');
+        $('.fuse').first().append(html);
+
+
+        setTimeout(function() {
+            html.addClass('show');
+        },1);
+
+        setTimeout(function() {
+            $('.fuse-alert-window').removeClass('show');
+            setTimeout(function() {
+                $('.fuse-alert-window').remove();
+            },500);
+        },3000);
     }
 });

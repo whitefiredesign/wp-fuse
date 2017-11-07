@@ -48,6 +48,7 @@ if(isset($keys)) {
 
     <!-- Plans -->
     <?php include_once(__DIR__ . '/subs/Stripe/dialog/admin-dialog-add-plan.php'); ?>
+    <?php include_once(__DIR__ . '/subs/Stripe/dialog/admin-dialog-delete-plan.php'); ?>
     
     <!-- / Dialog Boxes -->
 </div>

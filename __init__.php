@@ -53,6 +53,7 @@ class __init__ {
          * Need to load immediately
          */
         include_once __DIR__ . '/lib/Email.php';
+        include_once __DIR__ . '/lib/Commerce/Commerce.php';
         
         add_action('init', function() {
             /**

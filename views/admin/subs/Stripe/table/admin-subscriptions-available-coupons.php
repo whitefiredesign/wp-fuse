@@ -7,15 +7,21 @@ if(empty($data)) {
     <table class="wp-list-table widefat fixed striped pages">
         <thead>
         <tr>
-            <th>Active?</th><th>Coupon</th><th>Terms</th><th>Redemptions</th><th>Expires</th><th></th>
+            <th>Enabled?</th><th>Coupon</th><th>Terms</th><th>Redemptions</th><th>Expires</th><th></th>
         </tr>
         </thead>
         <tbody>
         <?php
-        foreach($data as $row) { ?>
+        foreach($data as $row) {
+            $coupon     = Commerce\get_coupon($row->id);
+            $enabled    = false;
+            if($coupon->status=='enabled') {
+                $enabled = true;
+            }
+            ?>
             <tr>
                 <td>
-                    <input type="checkbox" id="<?php echo $row->id; ?>-active" name="coupon-active" value="<?php echo $row->id; ?>" />
+                    <input type="checkbox" id="<?php echo $row->id; ?>-active" class="enable-disable-coupon" name="coupon-active" value="<?php echo $row->id; ?>" <?php if($enabled) { echo 'checked'; } ?>/>
                 </td>
                 <td><?php echo $row->id; ?></td>
                 <td><?php
