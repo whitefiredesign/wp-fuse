@@ -26,6 +26,21 @@ class Stripe_Helper  {
     }
 
     /**
+     * Returns the Stripe plan object
+     * @param $plan_id
+     * @return mixed
+     */
+    public static function get_one_plan($plan_id) {
+        try {
+            $output = self::sanitize_response(\Stripe\Plan::retrieve($plan_id));
+        } catch(\Exception $e) {
+            $output = array('error' => $e->getMessage());
+        }
+
+        return json_decode($output);
+    }
+
+    /**
      * Displays the available plans results in a table
      * @param bool $ajax
      * @return mixed
@@ -207,6 +222,9 @@ class Stripe_Helper  {
         try {
             $coupon = \Stripe\Coupon::retrieve($id);
             $output = $coupon->delete();
+            if(function_exists('\\Fuse\\Commerce\\update_coupon')) {
+                Commerce\update_coupon($id, 'deleted');
+            }
 
             return json_decode($output);
         } catch(\Exception $e) {
@@ -246,6 +264,9 @@ class Stripe_Helper  {
         try {
             $plan = \Stripe\Plan::retrieve(trim($id));
             $output = $plan->delete();
+            if(function_exists('\\Fuse\\Commerce\\update_plan')) {
+                Commerce\update_plan($id, 'deleted');
+            }
 
             return json_decode($output);
         } catch(\Exception $e) {
@@ -333,7 +354,11 @@ class Stripe_Helper  {
             return false;
         }
 
-        return json_encode($response->data);
+        if(isset($response->data)) {
+            return json_encode($response->data);
+        }
+
+        return json_encode($response);
 
     }
 

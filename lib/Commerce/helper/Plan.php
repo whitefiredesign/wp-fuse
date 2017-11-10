@@ -38,9 +38,9 @@ function insert_plan($plan_id, $status = 'disabled', $vendor = 'stripe') {
 
     if(!get_plan($plan_id)) {
 
-        $args['plan_id'] = $plan_id;
-        $args['vendor'] = $vendor;
-        $args['status'] = $status;
+        $args['plan_id']    = $plan_id;
+        $args['vendor']     = $vendor;
+        $args['status']     = $status;
 
         return $wpdb->insert($wpdb->prefix . 'commerce_plans', $args, array('%s', '%s', '%s'));
     }
@@ -168,4 +168,16 @@ function delete_plan_meta($plan_id, $meta_key, $meta_value = '') {
     $id     = $plan->id;
 
     return delete_metadata('plan', $id, $meta_key, $meta_value);
+}
+
+/**
+ * Returns complete list of enabled plans
+ * @return array|null|object
+ */
+function get_enabled_plans() {
+    global $wpdb;
+
+    $plans = $wpdb->get_results("SELECT * FROM ".$wpdb->prefix."commerce_plans WHERE status='enabled'");
+    
+    return $plans;
 }

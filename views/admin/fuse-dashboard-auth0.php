@@ -7,13 +7,42 @@
     $options = get_option('_auth0_options');
 } ?>
 
+<?php
+/**
+ * Auth0 Get Management API Token
+ */
+global $auth0Api;
+$api            = Auth0::get_token($options['domain'], $options['client-id'], $options['client-secret']);
+$token          = $api;
+if(!$token['error']) {
+    $auth0Token     = $token['data']->access_token;
+    $auth0Api       = new \Auth0\SDK\API\Management($auth0Token, $options['domain']);
+} else {
+    $auth0Api   = false;
+}
+?>
 
 <div class="wrap fuse">
     <h1>Fuse Auth0</h1>
 
+    <h2>Management API</h2>
+    <div class="fuse-alert <?= ($token['error'] ? 'error' : 'success') ?>">
+        <?php echo $token['message']; ?>
+    </div>
+
     <form method="post" action="">
+
+
         <table class="form-table">
             <tbody>
+            <!--<tr>
+                <th scope="row">
+                    <label for="token_url">Token URL</label>
+                </th>
+                <td>
+                    <input id="token_url" class="regular-text" name="auth0[token-url]" type="text" value="<?= (isset($options['token-url']) ? $options['token-url'] : "") ?>">
+                </td>
+            </tr> -->
             <tr>
                 <th scope="row">
                     <label for="domain">Domain</label>

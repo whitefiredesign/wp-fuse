@@ -333,12 +333,20 @@ class Stripe_Ajax {
         if(isset($_REQUEST['plan_id'])) {
 
             $plan_id = $_REQUEST['plan_id'];
-
+            if(function_exists('\\Fuse\\Commerce\\update_plan_meta')) {
+                $stripe_plan = Stripe::get_one_plan($plan_id);
+                \Fuse\Commerce\update_plan_meta($plan_id, 'price',              $stripe_plan->amount);
+                \Fuse\Commerce\update_plan_meta($plan_id, 'currency',           $stripe_plan->currency);
+                \Fuse\Commerce\update_plan_meta($plan_id, 'interval',           $stripe_plan->interval);
+                \Fuse\Commerce\update_plan_meta($plan_id, 'interval_count',     $stripe_plan->interval_count);
+                \Fuse\Commerce\update_plan_meta($plan_id, 'trial_period_days',  $stripe_plan->trial_period_days);
+            }
+            
             if(!Commerce\enable_plan($plan_id, true)) {
                 $response['error']      = true;
                 $response['message']    = 'Plan does not exist';
             }
-
+            
             echo json_encode($response);
         }
         
