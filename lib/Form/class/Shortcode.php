@@ -13,6 +13,7 @@ class Form_Shortcode extends Form_Db {
             'success-msg'       => __('Your submission was successful'),
             'error-msg'         => __('Your submission was unsuccessful'),
             'validate_classes'  => array(),
+            'field-values'      => false,
             
             // JS Code
             'on-success'        => false,
@@ -48,6 +49,10 @@ class Form_Shortcode extends Form_Db {
             //echo '</pre>';
         }
 
+        if($atts['field-values']) {
+            $atts['field-values'] = (array) json_decode($atts['field-values']);
+        }
+        
         $fm     = new Form($atts['name'], $form->fields, $update, $atts['ajax'], $atts);
 
         // If validate classes set

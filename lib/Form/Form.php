@@ -30,6 +30,22 @@ class Form extends Form_Builder {
             $this->scatts           = $atts;
             $this->_id              = $db->exists($this->name);
 
+            // If force change field values
+            $i = -1;
+            if($atts['field-values'] && is_array($atts['field-values'])) {
+                foreach($this->fields as $field) {
+                    foreach($atts['field-values'] as $k => $v) {
+                        if($field['name']==$k) {
+                            $this->fields[$i]['value'] = $v;
+                        }
+                    }
+
+                    $i++;
+
+                }
+
+            }
+
             // Assign default value to submit
             $i=0;
             foreach($this->fields as $k => $v) {
