@@ -1,6 +1,4 @@
-<?php namespace Fuse; ?>
-
-<?php
+<?php namespace Fuse;
 
 /**
  * Class Ajax
