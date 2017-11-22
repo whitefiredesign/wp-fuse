@@ -17,6 +17,7 @@ class Form_Shortcode extends Form_Db {
             
             // JS Code
             'on-success'        => false,
+            'additional-success-message'=> false,
             'ajax'              => false
         ), $a, 'fuse-form');
 
@@ -68,18 +69,29 @@ class Form_Shortcode extends Form_Db {
             //echo '<pre>' . print_r($fm) . '</pre>';
             //$contents = ob_get_contents();
             //ob_end_clean();
+            $output = '';
 
             $on_success = false;
             if($atts['on-success']) {
                 $on_success = $atts['on-success'];
             }
-            
-            if(!$on_success) {
-                // Run any script if specified
-                return '<script type="text/javascript">' . $atts['on-success'] . '</script>';
-            } else {
-                return \Fuse\wrap_notice('success bg-success', $atts['success-msg']);
+
+            $additional_success_message = false;
+            if($atts['additional-success-message']) {
+                $additional_success_message = $atts['additional-success-message'];
             }
+            
+            if($on_success) {
+                // Run any script if specified
+                $output .= '<script type="text/javascript">' . $atts['on-success'] . '</script>';
+            }
+
+            $output .= \Fuse\wrap_notice('success bg-success', $atts['success-msg']);
+            if($additional_success_message) {
+                $output .= $additional_success_message;
+            }
+
+            return $output;
         }
     }
 }

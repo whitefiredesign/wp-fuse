@@ -139,8 +139,9 @@ class Form extends Form_Builder {
             $fm->submit_success = (bool) $fm->submit_success;
 
             $messages = array(
-                'success'       => \Fuse\wrap_notice('success bg-success', $fields->fields['config']['shortcode_atts']['success-msg']),
-                'on-success'    => $fields->fields['config']['shortcode_atts']['on-success']
+                'success'                       => \Fuse\wrap_notice('success bg-success', $fields->fields['config']['shortcode_atts']['success-msg']),
+                'on-success'                    => $fields->fields['config']['shortcode_atts']['on-success'],
+                'additional-success-message'    => html_entity_decode($fields->fields['config']['shortcode_atts']['additional-success-message'])
             );
 
             echo wp_json_encode(array(
