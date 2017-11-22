@@ -8,6 +8,18 @@ MIT
 
 Version
 -------
+0.0.14
+* LIB\STRIPE : Lots of updates
+* LIB\FORM : Fixed cc and bcc sending options
+* LIB\FORM : Created 'mail' config in admin 
+* LIB\FORM : Fixed table in admin when new fields created
+* LIB\FORM : Added ability to send message
+* Added Branding
+* LIB\TEMPLATE : Added ability to set extension to template
+* LIB\STRIPE : Return secret key `Stripe::get_secret_key()`
+* LIB\STRIPE : Echo publishable key
+* LIB\STRIPE : Add option to switch between Test and Live
+
 0.0.13.patch1
 * LIB\MAILCHIMP : Add subscribe and unsubscribe method
 * LIB\FORM : Add form submission viewport move offset

@@ -1,10 +1,12 @@
 <?php
 namespace Fuse;
 
-class Auth0 {
+include_once(__DIR__ . '/class/Helper.php');
+
+class Auth0 extends Auth0_Helper {
 
     public static $slug = 'fuse-auth0';
-    public static $callback_url = '/?processing-auth0=true';
+    public static $auth0;
     
     public function __construct() {
 
@@ -18,7 +20,7 @@ class Auth0 {
         // Add JS
         $options = self::get_options();
         if(is_array($options)) {
-            $options['callback-url'] = get_site_url() . self::$callback_url;
+            $options['callback-url'] = get_site_url() . self::get_callback_url();
             wp_register_script('Fuse.Auth0', get_file_abspath(__FILE__) . '/Auth0.min.js', array('auth0'), config::$version, true);
             wp_localize_script('Fuse.Auth0', 'Auth0_config', $options);
             add_action('wp_enqueue_scripts', function () {

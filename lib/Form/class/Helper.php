@@ -92,5 +92,16 @@ class Form_Helper {
 
         return $fields_array;
     }
+
+    public static function get_admin_url() {
+        return admin_url() . 'admin.php?page=' . Form::$slug;
+    }
     
+    public static function get_admin_edit_form_url($form_name) {
+        if(!is_admin()) {
+            return false;
+        }    
+        
+        return self::get_admin_url() . '&form-edit=' . $form_name;
+    }
 }

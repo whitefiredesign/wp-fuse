@@ -7,17 +7,19 @@ class Form_Shortcode extends Form_Db {
         add_shortcode( 'fuse-form', array($this, 'shortcode'));
     }
 
-    public function shortcode($atts) {
+    public function shortcode($a) {
         $atts = shortcode_atts(array(
             'name'              => false,
             'success-msg'       => __('Your submission was successful'),
             'error-msg'         => __('Your submission was unsuccessful'),
             'validate_classes'  => array(),
+            'field-values'      => false,
             
             // JS Code
             'on-success'        => false,
+            'additional-success-message'=> false,
             'ajax'              => false
-        ), $atts, 'fuse-form');
+        ), $a, 'fuse-form');
 
         // If validate classes set
         $validate_classes = false;
@@ -43,8 +45,15 @@ class Form_Shortcode extends Form_Db {
         if($atts['ajax']) {
             $update = true;
             $form->fields['config']['shortcode_atts'] = $atts;
+            //echo '<pre>';
+            //print_r($form->fields['config']['shortcode_atts']);
+            //echo '</pre>';
         }
 
+        if($atts['field-values']) {
+            $atts['field-values'] = (array) json_decode($atts['field-values']);
+        }
+        
         $fm     = new Form($atts['name'], $form->fields, $update, $atts['ajax'], $atts);
 
         // If validate classes set
@@ -55,14 +64,34 @@ class Form_Shortcode extends Form_Db {
         if(!$fm->form()->submit_success) {
             return $fm->form()->html;
         } else {
-            
-            if(!$atts['on-success']) {
-                return \Fuse\wrap_notice('success bg-success', $atts['success-msg']);
-            } else {
-                
-                // Run any script if specified
-                return '<script type="text/javascript">'.html_entity_decode($atts['on-success']).'</script>';
+
+            //ob_start();
+            //echo '<pre>' . print_r($fm) . '</pre>';
+            //$contents = ob_get_contents();
+            //ob_end_clean();
+            $output = '';
+
+            $on_success = false;
+            if($atts['on-success']) {
+                $on_success = $atts['on-success'];
             }
+
+            $additional_success_message = false;
+            if($atts['additional-success-message']) {
+                $additional_success_message = $atts['additional-success-message'];
+            }
+            
+            if($on_success) {
+                // Run any script if specified
+                $output .= '<script type="text/javascript">' . $atts['on-success'] . '</script>';
+            }
+
+            $output .= \Fuse\wrap_notice('success bg-success', $atts['success-msg']);
+            if($additional_success_message) {
+                $output .= $additional_success_message;
+            }
+
+            return $output;
         }
     }
 }

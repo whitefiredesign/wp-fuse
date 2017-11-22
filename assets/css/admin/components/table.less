@@ -1,0 +1,48 @@
+table {
+  width:100%;
+
+  &.wp-list-table {
+    th {
+      background: lighten(@bcolour_1, 50%);
+    }
+  }
+
+  &.datatable {
+    td.expand {
+      cursor:pointer;
+
+      &:before {
+        font: normal 20px/1 'dashicons';
+        content: "\f132";
+      }
+    }
+
+    th.sorting {
+      cursor:pointer;
+    }
+
+    td.no-sort, th.no-sort {
+      .no-sort::after { display: none!important; }
+      .no-sort { pointer-events: none!important; cursor: default!important; }
+    }
+
+    tr.shown {
+      background:#f1f1f1;
+    }
+
+    tr.br td {
+      border-bottom:1px solid #efefef;
+    }
+
+    tr.shown td.expand {
+      &:before {
+        font: normal 20px/1 'dashicons';
+        content: "\f460";
+      }
+    }
+
+    tr.expanded-row > td {
+      background:#f1f1f1;
+    }
+  }
+}

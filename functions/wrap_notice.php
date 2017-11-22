@@ -5,7 +5,7 @@ function wrap_notice($classes = false, $text, $wrap = false) {
         return false;
     }        
 
-    $string = '<span class="'.$classes.'">'.__($text).'</span>';
+    $string = '<div class="'.$classes.'">'.__($text).'</div>';
     if($wrap) {
         $string = sprintf($wrap, $string);        
     }

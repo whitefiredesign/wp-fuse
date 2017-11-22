@@ -29,19 +29,29 @@ class Template {
         wp_enqueue_script('Fuse.Template');
     }
 
-    public static function part($template=array(), $data=array()) {
+    public static function part($template=array(), $data=array(), $ext = 'php') {
         $ajax = false;
 
         if(isset($_REQUEST['Template_ajax'])) {
             $ajax       = true;
-            $template   = $_REQUEST['template'];
-            $data       = $_REQUEST['data'];
+            if(isset($_REQUEST['template'])) {
+                $template   = $_REQUEST['template'];
+            }
+            if(isset($_REQUEST['data'])) {
+                $data       = $_REQUEST['data'];
+            }
+            if(isset($_REQUEST['ext'])) {
+                $ext        = $_REQUEST['ext'];
+            }
         }
 
-        if(empty($template)) {
+        $template = $template[0] . '/' . $template[1] . '.'.$ext;
+
+        if(empty($template) || !file_exists(get_template_directory() . '/' . $template)) {
             $output = array(
                 'success'   => 0,
-                'message'   => 'Template not found'
+                'message'   => 'Template not found',
+                'template'  => $template
             );
 
             if($ajax) {
@@ -53,13 +63,14 @@ class Template {
         }
 
         ob_start();
-        include(locate_template($template[0] . '-' . $template[1] . '.php'));
+        include(locate_template($template));
         $contents = ob_get_contents();
         ob_end_clean();
 
         $output = array(
             'success'   => 1,
-            'html'      => $contents
+            'html'      => $contents,
+            'template'  => $template
         );
 
         if($ajax) {

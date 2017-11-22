@@ -7,7 +7,7 @@
     $options = get_option('_settings_options');
 } ?>
 
-<div class="wrap">
+<div class="wrap fuse">
     <h1>Welcome to Fuse</h1>
     <h2>Version - <?php echo config::$version; ?></h2>
     <p>Fuse is a micro-framework for WordPress developed by and for the devs @ White Fire Web Design.</p>
@@ -52,7 +52,7 @@
             </tbody>
         </table>
         <p class="submit">
-            <input name="submit" id="submit" class="button button-primary" value="Save Changes" type="submit">
+            <input name="submit" id="submit" class="button fuse-branded" value="Save Changes" type="submit">
         </p>
     </form>
 

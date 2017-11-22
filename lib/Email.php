@@ -38,14 +38,22 @@ class Email {
             $headers[]  = 'From: ' .$this->from;
         }
         if($this->cc) {
-            foreach($this->cc as $cc) {
-                $headers[] = 'Cc: '.$cc.'';
+            if(is_array($this->cc)) {
+                foreach ($this->cc as $cc) {
+                    $headers[] = 'Cc: ' . $cc . '';
+                }
+            } else {
+                $headers[] = 'Cc: ' . $this->cc . '';
             }
         }
 
         if($this->bcc) {
-            foreach($this->bcc as $bcc) {
-                $headers[] = 'Bcc: '.$bcc.'';
+            if(is_array($this->bcc)) {
+                foreach ($this->bcc as $bcc) {
+                    $headers[] = 'Bcc: ' . $bcc . '';
+                }
+            } else {
+                $headers[] = 'Bcc: ' . $this->bcc . '';
             }
         }
 

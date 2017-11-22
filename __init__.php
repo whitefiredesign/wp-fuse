@@ -9,10 +9,11 @@ if(file_exists(__DIR__ . '/vendor/autoload.php')) {
 }
 
 class config {
-    public static $version  = '0.0.13-dev';
+    public static $version  = '0.0.14';
     public static $dev      = true;
     public static $slug     = 'wp-fuse';
     public static $viewspath= __DIR__ . '/views/';
+    public static $fusedir  = '/vendor/whitefiredesign/wp-fuse';
 }
 
 class __init__ {
@@ -35,6 +36,11 @@ class __init__ {
         $this->_fix();
 
         /**
+         * Publish assets
+         */
+        $this->_assets();
+
+        /**
          * Ready admin Fuse
          */
         $this->dashboard();
@@ -47,6 +53,7 @@ class __init__ {
          * Need to load immediately
          */
         include_once __DIR__ . '/lib/Email.php';
+        include_once __DIR__ . '/lib/Commerce/Commerce.php';
         
         add_action('init', function() {
             /**
@@ -80,6 +87,10 @@ class __init__ {
 
     private function _fix() {
         $this->_load('fix');
+    }
+    
+    private function _assets() {
+        $this->_load('assets');
     }
 
     private function _load($dir) {

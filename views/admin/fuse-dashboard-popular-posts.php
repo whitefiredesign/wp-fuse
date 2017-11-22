@@ -13,7 +13,7 @@ if(isset($_POST['submit'])) {
 ?>
 
 <?php //echo $options['ajax']; ?>
-<div class="wrap">
+<div class="wrap fuse">
     <h1>Fuse Popular Posts</h1>
 
     <form method="post" action="">
@@ -29,7 +29,7 @@ if(isset($_POST['submit'])) {
         </table>
 
         <p class="submit">
-            <input name="submit" id="submit" class="button button-primary" value="Save Changes" type="submit">
+            <input name="submit" id="submit" class="button fuse-branded" value="Save Changes" type="submit">
         </p>
     </form>
 </div>    
