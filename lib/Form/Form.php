@@ -53,7 +53,7 @@ class Form extends Form_Builder {
                 if($k=='config') {
                 } else {
                     $i++;
-                    if($v['type']=='submit') {
+                    if(isset($v['type']) && $v['type']=='submit') {
                         $this->fields[$i]['name'] = $this->name.'_submit_btn';
                     }
                 }

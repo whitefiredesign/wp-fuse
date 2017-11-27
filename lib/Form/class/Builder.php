@@ -592,6 +592,33 @@ class Form_Builder extends Form_Helper {
             return $output;
         }
 
+        // If custom function set
+        if(array_key_exists('custom', $type) && isset($type['custom']['func'])) {
+
+            $func               = $type['custom']['func'];
+            $function_exists    = false;
+            if(is_array($func)) {
+                if(method_exists($func[0], $func[1])) {
+                    $function_exists = true;
+                }
+            } else {
+                if(function_exists($func)) {
+                    $function_exists = true;
+                }
+            }
+
+            if($function_exists) {
+                $result = $type['custom']['func']($val);
+
+                if (!$result) {
+                    $error = true;
+
+                    $output['valid'] = 0;
+                    $output['message'][] = $type['custom']['error_msg'];
+                }
+            }
+        }
+
         // Validate required field
         if(array_key_exists('required', $type) && $type['required']) {
 
