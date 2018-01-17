@@ -68,6 +68,22 @@ class Stripe_Ajax {
         // disable plan
         add_action( 'wp_ajax_stripe_disable_plan',
             array($this, 'disable_plan'));
+
+        // Save token details
+        add_action( 'wp_ajax_stripe_save_token',
+            array($this, 'save_token'));
+        
+        // Save card details
+        add_action( 'wp_ajax_stripe_save_card',
+            array($this, 'save_card'));
+
+        // Create customer
+        add_action( 'wp_ajax_stripe_create_customer',
+            array($this, 'create_customer'));
+
+        // Create subscription
+        add_action( 'wp_ajax_stripe_create_subscription',
+            array($this, 'create_subscription'));
     }
 
     /**
@@ -371,6 +387,111 @@ class Stripe_Ajax {
 
             echo json_encode($response);
         }
+
+        wp_die();
+    }
+    
+    /**
+     * Ajax hook for saving card number to user ID
+     */
+    public static function save_card() {
+        $response = array(
+            'error'     => false,
+            'message'   => 'Successfully saved card'
+        );
+        
+        if(isset($_REQUEST['stripe_card_id']) && isset($_REQUEST['stripe_card_id'])) {
+            Stripe::save_card($_REQUEST['stripe_card_id'], $_REQUEST['user_id']);              
+        } else {
+            $response = array(
+                'error'     => true,
+                'message'   => 'User ID or Card ID not set'
+            );
+        }
+
+        echo json_encode($response);
+        
+        wp_die();
+    }
+
+    /**
+     * Ajax hook for saving token number to user ID
+     */
+    public static function save_token() {
+        $response = array(
+            'error'     => false,
+            'message'   => 'Successfully saved token'
+        );
+
+        if(isset($_REQUEST['stripe_token_id']) && isset($_REQUEST['stripe_token_id'])) {
+            Stripe::save_token($_REQUEST['stripe_token_id'], $_REQUEST['user_id']);
+        } else {
+            $response = array(
+                'error'     => true,
+                'message'   => 'User ID or Token ID not set'
+            );
+        }
+
+        echo json_encode($response);
+
+        wp_die();
+    }
+
+    /**
+     * Ajax hook for creating customer from token
+     */
+    public static function create_customer() {
+        $response = array(
+            'error'     => false,
+            'message'   => 'Successfully created customer'
+        );
+
+        if(isset($_REQUEST['stripe_token_id']) && isset($_REQUEST['stripe_token_id'])) {
+            $customer_id = Stripe::create_customer($_REQUEST['stripe_token_id'], $_REQUEST['user_id']);
+            $response['customer_id'] = $customer_id;
+        } else {
+            $response = array(
+                'error'     => true,
+                'message'   => 'User ID or Token ID not set'
+            );
+        }
+
+        echo json_encode($response);
+
+        wp_die();
+    }
+
+    /**
+     * Ajax hook for creating subscription from customer id
+     */
+    public static function create_subscription() {
+        $response = array(
+            'error'     => false,
+            'message'   => 'Successfully created subscription'
+        );
+        
+        if(isset($_REQUEST['stripe_customer_id']) && isset($_REQUEST['stripe_plan'])) {
+            if(!isset($_REQUEST['tax_percent'])) {
+                $_REQUEST['tax_percent'] = false;
+            }
+
+            $sub = Stripe::create_subscription($_REQUEST['stripe_customer_id'], $_REQUEST['stripe_plan'], $_REQUEST['tax_percent']);
+            if($sub['error']) {
+                $response = array(
+                    'error'     => true,
+                    'message'   => $sub['error']
+                );
+            }
+
+        } else {
+            $response = array(
+                'error'     => true,
+                'message'   => 'User ID or Token ID not set'
+            );
+            
+        }
+
+        echo json_encode($response);
 
         wp_die();
     }

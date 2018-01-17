@@ -73,6 +73,7 @@ class __init__ {
 
 
             do_action('fuse-loaded');
+            do_action('fuse_loaded');
         });
 
     }

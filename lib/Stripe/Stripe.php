@@ -2,6 +2,7 @@
 namespace Fuse;
 
 include_once(__DIR__ . '/class/Helper.php');
+include_once(__DIR__ . '/class/Hook.php');
 
 
 class Stripe extends Stripe_Helper {
