@@ -360,7 +360,174 @@ class Stripe_Helper  {
 
     }
 
+    /**
+     * Save Card ID to user
+     * @param $card_id
+     * @param $user_id
+     * @return bool
+     */
+    public static function save_card($card_id, $user_id) {
+        if(!$card_id || !$user_id) {
+            return false;
+        }
 
+        update_user_meta($user_id, 'stripe_card_id', $card_id);
+
+        return $card_id;
+    }
+
+
+    /**
+     * Save token response from Stripe
+     * @param $token
+     * @param $user_id
+     * @return bool
+     */
+    public static function save_token($token, $user_id) {
+        if(!$token || !$user_id) {
+            return false;
+        }
+
+        update_user_meta($user_id, 'stripe_token_id', $token);
+
+        return $token;
+    }
+
+    /**
+     * Get the Stripe.js token
+     * @param $user_id
+     * @return bool
+     */
+    public static function get_token($user_id) {
+        if(!$user_id) {
+            return false;
+        }
+
+        return get_user_meta($user_id, 'stripe_token_id');
+
+    }
+
+    /**
+     * Create customer
+     * @param $token
+     * @param $user_id
+     * @return bool|string
+     */
+    public static function create_customer($token, $user_id) {
+        if(!$token || !$user_id) {
+            return false;
+        }
+
+        $results = \Stripe\Customer::create(array('source' => $token));
+        
+        update_user_meta($user_id, 'stripe_customer_id', $results->id);
+        
+        return $results->id;
+    }
+
+    /**
+     * Check if logged in user has card saved
+     * @param $user_id
+     * @return bool
+     */
+    public static function has_card_saved($user_id) {
+        if(!$user_id || !is_user_logged_in()) {
+            return false;     
+        }
+        
+        return self::get_card($user_id);
+    }
+
+    /**
+     * Return the card id of user
+     * @param $user_id
+     * @return bool
+     */
+    public static function get_card($user_id) {
+        if(!$user_id || !is_user_logged_in()) {
+            return false;
+        }
+        
+        $card = get_user_meta($user_id, 'stripe_card_id');
+        
+        return $card;
+    }
+
+    /**
+     * Check if user is customer
+     * @param $user_id
+     * @return bool
+     */
+    public static function is_customer($user_id) {
+        if(!$user_id || !is_user_logged_in()) {
+            return false;
+        }
+
+        return get_user_meta($user_id, 'stripe_customer_id');
+    }
+
+    /**
+     * Create subscription
+     * @param $customer_id
+     * @param $plan
+     * @param bool $tax_percent
+     * @return bool
+     */
+    public static function create_subscription($customer_id, $plan, $tax_percent = false) {
+        if(!$customer_id || !$plan) {
+            return false;
+        }
+
+        $args = array(
+            'customer' => $customer_id,
+            'items' => array(
+                array(
+                    'plan' => $plan
+                )
+            )
+        );
+
+        if($tax_percent) {
+            $args['tax_percent'] = (int) $tax_percent;
+        }
+
+        try {
+            $s = \Stripe\Subscription::create($args);
+            $output = array('error' => false);
+            update_user_meta(self::get_user_id_by_customer_id($customer_id), 'stripe_plan', $plan);
+
+        } catch(\Exception $e) {
+            $output = array('error' => $e->getMessage());
+        }
+
+        return json_decode($output);
+    }
+
+    /**
+     * Returns the WP user id by Stripe customer id
+     * @param $customer_id
+     * @return bool
+     */
+    public static function get_user_id_by_customer_id($customer_id) {
+        $args = array(
+            'fields'  => 'ID',
+            'meta_query' => array(
+                array(
+                    'key'     => 'stripe_customer_Id',
+                    'value'   => $customer_id
+                )
+            )
+        );
+
+        $q = new \WP_User_Query($args);
+        $r = $q->get_results();
+
+        if(!empty($r)) {
+            return $r[0];
+        }
+        
+        return false;
+    }
 
     /**
      * Coupons

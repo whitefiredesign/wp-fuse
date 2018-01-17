@@ -54,11 +54,15 @@ class Form_Builder extends Form_Helper {
     private $text_types     = array(
         'textarea'
     );
+    private $select_types   = array(
+        'select'
+    );
     private $submit_types   = array(
         'submit'
     );
     private $submit_field   = '<button type="submit" id="%s" class="%s" name="%s" value="%s" %s>%s</button>';
     private $text_field     = '<textarea id="%s" class="%s" name="%s" placeholder="%s" %s %s>%s</textarea>';
+    private $select_field   = '<select id="%s" class="%s" name="%s" %s>%s</select>';
 
 
     /**
@@ -131,6 +135,21 @@ class Form_Builder extends Form_Helper {
                     $fields[$i][$key] = $this->keys[$key];
                 }
             }
+
+            // If multi
+            if(($field['type']=='checkbox' || $field['type']=='select') && isset($field['multi'])) {
+                foreach(array_keys($this->keys) as $key) {
+                    $m = 0;
+                    foreach($fields[$i]['values'] as $multi) {
+                        if(!isset($fields[$i]['values'][$m][$key])) {
+                            $fields[$i]['values'][$m][$key] = $this->keys[$key];
+                        }
+
+                        $m++;
+                    }
+                }
+            }
+
             $i++;
         }
 
@@ -192,6 +211,7 @@ class Form_Builder extends Form_Helper {
                 //$group = $this->
 
                 if($field['type']=='file') {
+                    // If field is file
 
                     // Generate a dummy field for collecting file info
                     $field_html .= sprintf(
@@ -219,8 +239,38 @@ class Form_Builder extends Form_Helper {
                         ''
                     );
 
-                } else {
+                } elseif($field['type']=='checkbox' && isset($field['multi'])) {
+                    // If field is checkbox array
+                    foreach($field['values'] as $checkbox) {
 
+                        // Ensure name is set to avoid error
+                        if(!isset($post_request[$field['name']]['value'])) {
+                            $post_request[$field['name']]['value'] = array();
+                        }
+
+                        // Ensure value is array for multi's
+                        if(is_string($post_request[$field['name']]['value'])) {
+                            $post_request[$field['name']]['value'] = explode(", ", $post_request[$field['name']]['value']);
+                        }
+
+                        $field_html .= $checkbox['field_before'] . '<label for="'.$checkbox['id'].'"> ' . sprintf(
+                                $this->input_field,
+                                $field['type'],
+                                $checkbox['id'],
+                                (isset($checkbox['classes']) && is_array($checkbox['classes']) ? implode(' ', $checkbox['classes']) : ''),
+                                $this->name . '[' . ($field['name'] ? $field['name'] : '') . '][]',
+                                '',
+                                ($checkbox['value'] ? $checkbox['value'] : '1'),
+                                (($checkbox['checked']) || (in_array($checkbox['value'], $post_request[$field['name']]['value'])) ? 'checked="checked"' : ''),
+                                ($checkbox['disabled'] ? 'disabled' : '') . ($checkbox['readonly'] ? 'readonly' : '')
+                            ) . ''.$checkbox['label'] .  '</label>' . $checkbox['field_after'];
+
+                        if($this->ajax) {
+                            $field_html .= '<input type="hidden" name="'.$this->name . '[' . ($field['name'] ? $field['name'] : '') . '][]'.'" value="">';
+                        }
+                    }
+
+                } else {
                     $field_html .= sprintf(
                         $this->input_field,
                         $field['type'],
@@ -250,6 +300,40 @@ class Form_Builder extends Form_Helper {
                 );
             }
 
+            // Select
+            if (in_array($field['type'], $this->select_types)) {
+                $options = '';
+
+                foreach($field['values'] as $option) {
+
+                    // Ensure name is set to avoid error
+                    if(!isset($post_request[$field['name']]['value'])) {
+                        $post_request[$field['name']]['value'] = array();
+                    }
+
+                    $selected = false;
+
+                    if($post_request[$field['name']]['value']==$option['value']) {
+                        $selected = "selected=\"selected\"";
+                    } else {
+                        if(isset($option['selected'])) {
+                            $selected = "selected=\"selected\"";
+                        }
+                    }
+
+                    $options .= '<option value="'.$option['value'].'" '.$selected.'>'.$option['label'].'</option>';
+                }
+
+                $field_html .= sprintf(
+                    $this->select_field,
+                    $field['id'],
+                    (is_array($field['classes']) ? implode(' ', $field['classes']) : ''),
+                    $this->name . '[' . $field['name'] . ']',
+                    ($field['disabled'] ? 'disabled' : ''),
+                    $options
+                );
+            }
+
             // Break
             if ($field['type']=='break') {
                 $field_html .= $field['html'];
@@ -257,13 +341,6 @@ class Form_Builder extends Form_Helper {
 
             // Submit
             if ($field['type']=='submit') {
-                //ob_start();
-                //echo '<pre>';
-                //print_r($field);
-                //echo '</pre>';
-                //$contents = ob_get_contents();
-                //ob_end_clean();
-                //$field_html .= $contents;
 
                 $field_html .= sprintf(
                     $this->submit_field,
@@ -345,6 +422,7 @@ class Form_Builder extends Form_Helper {
             'html'              => $output_html,
             'submit_success'    => $this->submit_success,
             'ajax'              => $this->ajax,
+            // shortcode atts
             'scatts'            => $this->scatts
         ), FALSE));
     }
@@ -418,49 +496,54 @@ class Form_Builder extends Form_Helper {
 
         foreach($fields as $field) {
 
-            if($field['validation']) {
-                $pvalidate = $this->validate(($field['value'] ? $field['value'] : ' '), $field['validation']);
+            if($field['type']!=='break') {
 
-                if($pvalidate['valid']) {
+                if ($field['validation']) {
+                    $pvalidate = $this->validate(($field['value'] ? $field['value'] : ' '), $field['validation']);
 
-                    $message_class = $this->validate_classes['message_valid'];
+                    if ($pvalidate['valid']) {
 
-                    // If field is valid
-                    $fields[$i]['classes'][]    = $this->validate_classes['field_valid'];
+                        $message_class = $this->validate_classes['message_valid'];
 
-                } else {
+                        // If field is valid
+                        $fields[$i]['classes'][] = $this->validate_classes['field_valid'];
 
-                    $error = true;
-
-                    $message_class = $this->validate_classes['message_invalid'];
-
-                    // If field is invalid
-                    $fields[$i]['classes'][]    = $this->validate_classes['field_invalid'];
-
-                }
-
-                $pvalidate['message'] = ($pvalidate['message'] ? $pvalidate['message'] : false);
-
-                if($pvalidate['message'] && $field['validation_display']) {
-
-
-                    if($field['validation_display']==='below') {
-                        $key_segment = 'after';
                     } else {
-                        $key_segment = 'before';
+
+                        $error = true;
+
+                        $message_class = $this->validate_classes['message_invalid'];
+
+                        // If field is invalid
+                        $fields[$i]['classes'][] = $this->validate_classes['field_invalid'];
+
                     }
 
-                    $fields[$i]['messages'][] = $pvalidate['message'];
+                    $pvalidate['message'] = ($pvalidate['message'] ? $pvalidate['message'] : false);
 
-                    $fields[$i]['field_'.$key_segment] = $fields[$i]['field_'.$key_segment] . '<ul class="' . $message_class . '">';
-                    foreach ($pvalidate['message'] as $message) {
-                        $fields[$i]['field_'.$key_segment] .= "<li>" . $message . "</li>";
+                    if ($pvalidate['message'] && $field['validation_display']) {
+
+
+                        if ($field['validation_display'] === 'below') {
+                            $key_segment = 'after';
+                        } else {
+                            $key_segment = 'before';
+                        }
+
+                        $fields[$i]['messages'][] = $pvalidate['message'];
+
+                        $fields[$i]['field_' . $key_segment] = $fields[$i]['field_' . $key_segment] . '<ul class="error-'. $field['name'] .' ' . $message_class . '">';
+                        foreach ($pvalidate['message'] as $message) {
+                            $fields[$i]['field_' . $key_segment] .= "<li>" . $message . "</li>";
+                        }
+                        $fields[$i]['field_' . $key_segment] .= '</ul>';
                     }
-                    $fields[$i]['field_'.$key_segment] .= '</ul>';
+
                 }
-
-                $i++;
             }
+
+            $i++;
+
         }
 
         return array(
@@ -590,6 +673,50 @@ class Form_Builder extends Form_Helper {
             $output['message']      = false;
 
             return $output;
+        }
+
+        // If custom function set
+        if(array_key_exists('custom', $type)) {
+
+            if(!is_array($type['custom'])) {
+                $type['custom'] = array($type['custom']);
+            }
+
+            foreach($type['custom'] as $custom) {
+
+                $func = $custom['func'];
+                $function_exists = false;
+                if (is_array($func)) {
+                    if (method_exists($func[0], $func[1])) {
+                        $function_exists = true;
+                    }
+                } else {
+                    if (function_exists($func)) {
+                        $function_exists = true;
+                    }
+                }
+
+                if ($function_exists) {
+                    $result = $custom['func']($val);
+
+                    if (isset($custom['return']) && !$custom['return']) {
+                        if ($result) {
+                            $error = true;
+
+                            $output['valid'] = 0;
+                            $output['message'][] = $custom['error_msg'];
+                        }
+                    } else {
+                        if (!$result) {
+                            $error = true;
+
+                            $output['valid'] = 0;
+                            $output['message'][] = $custom['error_msg'];
+                        }
+                    }
+
+                }
+            }
         }
 
         // Validate required field

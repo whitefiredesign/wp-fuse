@@ -2,6 +2,7 @@
 namespace Fuse;
 
 include_once(__DIR__ . '/class/Helper.php');
+include_once(__DIR__ . '/class/Hook.php');
 
 
 class Stripe extends Stripe_Helper {
@@ -184,7 +185,7 @@ class Stripe extends Stripe_Helper {
          */
 
         if(($env!='test') && ($env!='live')) {
-            throw new \Exception('Stripe::get_keys() : $env needs to be set to test or live');
+           // throw new \Exception('Stripe::get_keys() : $env needs to be set to test or live');
         }
 
         /**
@@ -211,7 +212,7 @@ class Stripe extends Stripe_Helper {
 
 
         if(empty($filtered)) {
-            throw new \Exception('Stripe::get_keys() : Results seem to be empty.');
+            //throw new \Exception('Stripe::get_keys() : Results seem to be empty.');
         }
 
         return $filtered;
