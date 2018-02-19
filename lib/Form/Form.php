@@ -86,17 +86,19 @@ class Form extends Form_Builder {
         if(is_admin()) {
             if (isset($_GET['page']) && $_GET['page']=='fuse-form') {
 
-                // jQuery UI
-                wp_enqueue_script('jquery-ui-core');
-                wp_enqueue_script('jquery-ui-tabs');
-                wp_enqueue_style('jquery-ui-theme', 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.min.css');
-                wp_enqueue_style('jquery-ui-base', 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/base/theme.min.css');
+                add_action('admin_enqueue_scripts', function() {
+                    // jQuery UI
+                    wp_enqueue_script('jquery-ui-core');
+                    wp_enqueue_script('jquery-ui-tabs');
+                    wp_enqueue_style('jquery-ui-theme', 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.min.css');
+                    wp_enqueue_style('jquery-ui-base', 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/base/theme.min.css');
 
-                // Datatables
-                wp_enqueue_script('jquery-datatables', 'https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js', array('jquery'), config::$version, false);
-                wp_enqueue_script('jquery-datatables-jq-ui', 'https://cdn.datatables.net/1.10.15/js/dataTables.jqueryui.min.js', array('jquery'), config::$version, false);
-                wp_enqueue_style('jquery-datatables-theme', 'https://cdn.datatables.net/1.10.15/css/dataTables.jqueryui.min.css');
-
+                    // Datatables
+                    wp_enqueue_script('jquery-datatables', 'https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js', array('jquery'), config::$version, false);
+                    wp_enqueue_script('jquery-datatables-jq-ui', 'https://cdn.datatables.net/1.10.15/js/dataTables.jqueryui.min.js', array('jquery'), config::$version, false);
+                    wp_enqueue_style('jquery-datatables-theme', 'https://cdn.datatables.net/1.10.15/css/dataTables.jqueryui.min.css');
+                });
+                
             }
         }
     }
@@ -106,7 +108,6 @@ class Form extends Form_Builder {
         if(config::$dev) {
             Util\Uglify::compile_single(__DIR__ . '/scripts/Form_Ajax.js',                  'min');
             Util\Uglify::compile_single(__DIR__ . '/scripts/jquery-serialize-object.js',    'min');
-
         }
 
         wp_register_script('Fuse.Form_Ajax', get_file_abspath(__FILE__) . '/scripts/Form_Ajax.min.js', array('jquery'), config::$version, true);
@@ -165,8 +166,8 @@ $support = get_theme_support( 'Fuse.Form' );
 if($support) {
     Form::dashboard();
 
-    add_action( 'wp_ajax_a_fuse_form_submit',           '\Fuse\Form::a_fuse_form_submit' );
-    add_action( 'wp_ajax_nopriv_a_fuse_form_submit',    '\Fuse\Form::a_fuse_form_submit' );
+    add_action( 'wp_ajax_fuse_form_submit',           '\Fuse\Form::a_fuse_form_submit' );
+    add_action( 'wp_ajax_nopriv_fuse_form_submit',    '\Fuse\Form::a_fuse_form_submit' );
 
     add_action( 'wp_enqueue_scripts', '\Fuse\Form::assets');
     new Form();

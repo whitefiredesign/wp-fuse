@@ -55,7 +55,8 @@ class MenuSubParent {
         foreach ( $this->_menu_items as $item ) {
             $temp_array[ $item->menu_item_parent ][] = $item;
         }
-        $tree = $this->build_items_tree( $temp_array, $temp_array[0] );
+        
+        $tree = $this->build_items_tree( $temp_array, array_values($temp_array)[0]);
 
         // Prepare updated items
         $updated_items = $this->get_level_items( $tree, $args->level, $args->child_of );

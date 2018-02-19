@@ -378,6 +378,24 @@ class Stripe_Helper  {
 
 
     /**
+     * Create new Card for user
+     * @param $token_id
+     * @param $user_id
+     * @return array|bool|\Stripe\StripeObject
+     */
+    public static function create_card($token_id, $user_id) {
+        if(!$token_id || !$user_id) {
+            return false;
+        }
+
+        $customer_id = self::get_customer_id_by_user_id($user_id);
+        $customer = \Stripe\Customer::retrieve($customer_id);
+        return $customer->sources->create(array("source" => $token_id));
+
+    }
+
+
+    /**
      * Save token response from Stripe
      * @param $token
      * @param $user_id
@@ -527,6 +545,67 @@ class Stripe_Helper  {
         }
         
         return false;
+    }
+
+    /**
+     * Returns the Stripe Customer object
+     * @param $customer_id
+     * @return object
+     */
+    public static function get_customer($customer_id) {
+        return \Stripe\Customer::retrieve($customer_id);
+    }
+
+    /**
+     * Returns the Stripe customer id by WP User id
+     * @param $user_id
+     * @return mixed
+     */
+    public static function get_customer_id_by_user_id($user_id) {
+        if(!$user_id) {
+            return false;
+        }
+        
+        return get_user_meta($user_id, 'stripe_customer_id', true);
+    }
+
+    /**
+     * Returns list of invoices associated to customer
+     * @param $customer_id
+     * @return bool|\Stripe\Collection
+     */
+    public static function get_customer_invoices($customer_id) {
+        if(!$customer_id) {
+            return false;
+        }
+        
+        return \Stripe\Invoice::all(array('customer'=>$customer_id));
+    }
+
+    /**
+     * Updates a customer
+     * @param $customer_id
+     * @param array $updates
+     * @return bool
+     */
+    public static function update_customer($user_id, $updates = array()) {
+        if(!$user_id) {
+            return false;
+        }
+
+        $customer_id = self::get_customer_id_by_user_id($user_id);
+        
+        $customer = \Stripe\Customer::retrieve($customer_id);
+        foreach($updates as $k => $v) {
+            $customer->{$k} = $v;
+
+            // If the card is changed
+            if($k=='source') {
+                $user_id = Stripe::get_user_id_by_customer_id($customer_id);
+                update_user_meta($user_id, 'stripe_card_id', $v);
+            }
+        }
+        $customer->save();
     }
 
     /**

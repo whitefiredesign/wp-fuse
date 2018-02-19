@@ -85,12 +85,19 @@ class MailChimp {
         );
 
         $insert = $this->api->post("lists/".$this->list_id."/members", $mc_data);
+        $update = false;
 
         if($merge_fields) {
-            $this->update($email, $merge_fields);
+            $update = $this->update($email, $merge_fields);
         }
 
-        return $insert;
+        return array(
+            'insert_response'       => $insert,
+            'update_response'       => $update,
+            'email'                 => $email,
+            'merge_fields'          => $merge_fields,
+            'status'                => $status
+        );
     }
 
     /**
@@ -107,7 +114,10 @@ class MailChimp {
         $subscriber_hash    = $this->api->subscriberHash($email);
         $unsubscribe        = $this->api->patch("lists/".$this->list_id."/members/".$subscriber_hash, $mc_data);
 
-        return $unsubscribe;
+        return array(
+            'subscriber_hash'   => $subscriber_hash,
+            'patch_response'    => $unsubscribe
+        );
     }
 
     /**
