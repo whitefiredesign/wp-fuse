@@ -72,6 +72,10 @@ class Stripe_Ajax {
         // Save token details
         add_action( 'wp_ajax_stripe_save_token',
             array($this, 'save_token'));
+
+        // Create card
+        add_action( 'wp_ajax_stripe_create_card',
+            array($this, 'create_card'));
         
         // Save card details
         add_action( 'wp_ajax_stripe_save_card',
@@ -80,6 +84,10 @@ class Stripe_Ajax {
         // Create customer
         add_action( 'wp_ajax_stripe_create_customer',
             array($this, 'create_customer'));
+
+        // Update customer
+        add_action( 'wp_ajax_stripe_update_customer',
+            array($this, 'update_customer'));
 
         // Create subscription
         add_action( 'wp_ajax_stripe_create_subscription',
@@ -415,6 +423,30 @@ class Stripe_Ajax {
     }
 
     /**
+     * Ajax hook for adding additional cards
+     */
+    public static function create_card() {
+        $response = array(
+            'error'     => false,
+            'message'   => 'Successfully saved card'
+        );
+        
+        if(isset($_REQUEST['stripe_token_id']) && isset($_REQUEST['user_id'])) {
+            $card = Stripe::create_card($_REQUEST['stripe_token_id'], $_REQUEST['user_id']);
+            $response['data'] = $card;
+        } else {
+            $response = array(
+                'error'     => true,
+                'message'   => 'User ID or Token ID not set'
+            );
+        }
+
+        echo json_encode($response);
+
+        wp_die();
+    }
+
+    /**
      * Ajax hook for saving token number to user ID
      */
     public static function save_token() {
@@ -423,12 +455,13 @@ class Stripe_Ajax {
             'message'   => 'Successfully saved token'
         );
 
-        if(isset($_REQUEST['stripe_token_id']) && isset($_REQUEST['stripe_token_id'])) {
+        if(isset($_REQUEST['stripe_token_id'])) {
             Stripe::save_token($_REQUEST['stripe_token_id'], $_REQUEST['user_id']);
         } else {
             $response = array(
                 'error'     => true,
-                'message'   => 'User ID or Token ID not set'
+                'message'   => 'User ID or Token ID not set',
+                'request'   => json_encode($_REQUEST)
             );
         }
 
@@ -453,6 +486,34 @@ class Stripe_Ajax {
             $response = array(
                 'error'     => true,
                 'message'   => 'User ID or Token ID not set'
+            );
+        }
+
+        echo json_encode($response);
+
+        wp_die();
+    }
+
+    /**
+     * Ajax hook for updating customer details
+     */
+    public static function update_customer() {
+        $response = array(
+            'error'     => false,
+            'message'   => 'Successfully updated customer'
+        );
+
+        if(isset($_REQUEST['stripe_customer_updates'])) {
+            $updates        = $_REQUEST['stripe_customer_updates'];
+            $user_id        = $_REQUEST['user_id'];
+            Stripe::update_customer($user_id, $updates);
+            
+            $response['updates'] = $updates;
+            
+        } else {
+            $response = array(
+                'error'     => true,
+                'message'   => 'stripe_update_customer or user_id request not set.'
             );
         }
 

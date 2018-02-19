@@ -34,6 +34,8 @@ class Form_Builder extends Form_Helper {
         'placeholder'       => false,
         'field_before'      => '',
         'field_after'       => '',
+        'input_before'      => '',
+        'input_after'       => '',
         'disabled'          => false,
         'readonly'          => false,
         'value'             => false,
@@ -215,7 +217,7 @@ class Form_Builder extends Form_Helper {
 
                     // Generate a dummy field for collecting file info
                     $field_html .= sprintf(
-                        $this->input_field,
+                        $field['input_before'] . $this->input_field . $field['input_after'],
                         'hidden',
                         $field['id'],
                         '',
@@ -228,7 +230,7 @@ class Form_Builder extends Form_Helper {
 
                     // Create the file field
                     $field_html .= sprintf(
-                        $this->input_field,
+                        $field['input_before'] . $this->input_field . $field['input_after'],
                         $field['type'],
                         $field['id'] . '-fuse-form-file',
                         (is_array($field['classes']) ? implode(' ', $field['classes']) : ''),
@@ -254,7 +256,7 @@ class Form_Builder extends Form_Helper {
                         }
 
                         $field_html .= $checkbox['field_before'] . '<label for="'.$checkbox['id'].'"> ' . sprintf(
-                                $this->input_field,
+                                $field['input_before'] . $this->input_field . $field['input_after'],
                                 $field['type'],
                                 $checkbox['id'],
                                 (isset($checkbox['classes']) && is_array($checkbox['classes']) ? implode(' ', $checkbox['classes']) : ''),
@@ -272,7 +274,7 @@ class Form_Builder extends Form_Helper {
 
                 } else {
                     $field_html .= sprintf(
-                        $this->input_field,
+                        $field['input_before'] . $this->input_field . $field['input_after'],
                         $field['type'],
                         $field['id'],
                         (is_array($field['classes']) ? implode(' ', $field['classes']) : ''),

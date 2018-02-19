@@ -52,10 +52,11 @@ class __init__ {
         /**
          * Need to load immediately
          */
-        include_once __DIR__ . '/lib/Email.php';
-        include_once __DIR__ . '/lib/Commerce/Commerce.php';
+
+
+        //include_once __DIR__ . '/lib/Menu/Menu.php';
         
-        add_action('init', function() {
+        //add_action('init', function() {
             /**
              * Need to load after application loaded
              */
@@ -67,14 +68,14 @@ class __init__ {
             require_if_theme_supports('Fuse.Gmap',          __DIR__ .'/lib/Gmap/Gmap.php');
             require_if_theme_supports('Fuse.PopularPosts',  __DIR__ .'/lib/PopularPosts/PopularPosts.php');
             require_if_theme_supports('Fuse.Form',          __DIR__ .'/lib/Form/Form.php');
-
-            /* TODO: Menu Modules */
-            require_if_theme_supports('Fuse.Menu',          __DIR__ .'/lib/Menu/Menu.php');
+            require_if_theme_supports('Fuse.BlockUsers',    __DIR__ .'/lib/BlockUsers/BlockUsers.php');
+            require_if_theme_supports('Fuse.LogUsers',      __DIR__ .'/lib/LogUsers/LogUsers.php');
+            require_if_theme_supports('Fuse.Commerce',      __DIR__ . '/lib/Commerce/Commerce.php');
+            require_if_theme_supports('Fuse.Email',         __DIR__ . '/lib/Email.php');
 
 
             do_action('fuse-loaded');
             do_action('fuse_loaded');
-        });
 
     }
     
