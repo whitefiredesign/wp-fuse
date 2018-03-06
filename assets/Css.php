@@ -20,7 +20,7 @@ class Css {
     }
 
     public function register_admin() {
-        wp_register_style( 'Fuse.noty-css',  get_stylesheet_directory_uri() . config::$fusedir . '/assets/lib/noty/lib/noty.css', false, VERSION, 'all');
+        wp_register_style( 'Fuse.noty-css',  get_stylesheet_directory_uri() . config::$fusedir . '/assets/lib/noty/lib/noty.css', false, config::$version, 'all');
     }
     
     public function register_public() {
@@ -28,7 +28,7 @@ class Css {
     }
 
     public function admin_branding() {
-        wp_register_style( 'admin-branding-css',  get_stylesheet_directory_uri() . config::$fusedir . '/assets/css/admin/branding.min.css', false, VERSION, 'all');
+        wp_register_style( 'admin-branding-css',  get_stylesheet_directory_uri() . config::$fusedir . '/assets/css/admin/branding.min.css', false, config::$version, 'all');
 
         //echo __DIR__ . '/css/admin/branding.less';
         Util\Less::compile(__DIR__ . '/css/admin/branding.less', 'min', array(
